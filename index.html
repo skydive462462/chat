@@ -51,6 +51,12 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
 .del{position:absolute;top:6px;right:6px;padding:0 7px;font-size:11px;border-width:1px;border-color:#ff4b2b;color:#ff4b2b;border-radius:8px}
 #sendbar{display:flex;gap:10px;padding:14px;border-top:1px solid var(--neon-border)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0a0a19;border:2px solid var(--neon-green);padding:12px 22px;border-radius:14px;font-weight:700;display:none;z-index:200;box-shadow:0 0 30px rgba(0,255,204,.4)}
+#callUI{position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(5,5,16,.97);backdrop-filter:blur(20px);padding:20px;text-align:center}
+#callAvatar{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:900;background:linear-gradient(135deg,var(--grad-1),var(--grad-3));animation:ringPulse 1.6s infinite}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 rgba(255,0,204,.55)}100%{box-shadow:0 0 0 48px rgba(255,0,204,0)}}
+#callName{font-size:1.8rem;font-weight:900}#callStatus{color:#888;font-weight:700;letter-spacing:1px;min-height:18px}
+.call-btns{display:flex;gap:14px;margin-top:22px}
+@media(prefers-reduced-motion:reduce){#callAvatar{animation:none}}
 @media(max-width:760px){.container{grid-template-columns:1fr;grid-template-rows:150px 1fr;padding:12px;gap:12px}.msg{max-width:90%}}
 </style>
 </head>
@@ -84,7 +90,7 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
       <div id="members"></div>
     </div>
     <div class="panel">
-      <div class="panel-header"><span id="chatTitle">Group chat</span><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></div>
+      <div class="panel-header"><span id="chatTitle">Group chat</span><span style="display:flex;gap:10px;align-items:center"><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
       <div id="msgs"></div>
       <div id="sendbar">
         <input id="msgIn" placeholder="Message… use @username to notify someone" autocomplete="off">
@@ -93,12 +99,21 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
     </div>
   </div>
 </div>
+<div id="callUI">
+  <div id="callAvatar"></div><div id="callName"></div><div id="callStatus"></div>
+  <audio id="remoteA" autoplay></audio>
+  <div class="call-btns">
+    <button id="acceptBtn" style="display:none">Accept</button>
+    <button id="muteBtn" class="btn-back">Mute</button>
+    <button id="hangBtn" class="btn-clear">Hang up</button>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,collection,doc,setDoc,addDoc,deleteDoc,onSnapshot,query,orderBy,limit,serverTimestamp,getDocs,writeBatch,arrayUnion,arrayRemove} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,doc,setDoc,addDoc,deleteDoc,onSnapshot,query,orderBy,limit,serverTimestamp,getDocs,writeBatch,arrayUnion,arrayRemove,where,updateDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getMessaging,getToken,onMessage} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
 /* ============ EDIT THIS SECTION ============ */
@@ -128,9 +143,7 @@ const ADMIN_EMAIL = "admin@sky.com";
 const NAMES = {
   admin: "SKY",
   rainbow: "rainbow",
-  daksh: "light",
-  alice: "alicya",
-  nazaal: "nazzzzzzzal"
+  daksh: "light"
 };
 /* ============================================ */
 
@@ -155,11 +168,13 @@ $('loginForm').onsubmit = async e => {
 $('outBtn').onclick = logout;
 // Log out = remove THIS device's notification token from the account, then sign out
 async function logout(){
+  if (callRef) endCall(true, false);
   try { const t = localStorage.getItem('fcmToken'); if (t && me) await setDoc(doc(db,'tokens',me), {tokens:arrayRemove(t)}, {merge:true}); } catch {}
   localStorage.removeItem('fcmToken'); signOut(auth);
 }
 
 onAuthStateChanged(auth, async user => {
+  if (callRef || pc) endCall(true, false);
   unsubs.forEach(f => f()); unsubs = []; if (unsubChat) unsubChat();
   dmWatch.forEach(f => f()); dmWatch.clear();
   if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
@@ -182,6 +197,10 @@ onAuthStateChanged(auth, async user => {
     if (gFirst) { gFirst = false; return; }
     s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me && mention.test(m.text || '')) alertUser(m.name + ' mentioned you', m.text, 'group', ''); } });
   }, () => {}));
+  // incoming voice calls
+  unsubs.push(onSnapshot(query(collection(db,'calls'), where('to','==',me), where('status','==','ringing')),
+    s => s.docChanges().forEach(c => { if (c.type === 'added') showIncoming(c.doc); }), () => {}));
+  getIce();   // warm up relay credentials
   autoNotif();   // already allowed notifications before? re-link this device silently
   openChat('group', '', 'Group chat');
 });
@@ -237,6 +256,7 @@ function openChat(kind, id, label){
   chat = {kind, id, label}; $('chatTitle').textContent = label; drawMembers();
   const canSend = kind==='group' || id.split('__').includes(me);
   $('msgIn').disabled = $('sendBtn').disabled = !canSend;
+  $('callBtn').style.display = (kind === 'dm' && id.split('__').includes(me)) ? 'flex' : 'none';
   $('msgIn').placeholder = canSend ? 'Message… use @username to notify someone' : 'Read-only (admin monitor)';
   if (unsubChat) unsubChat();
   unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => {
@@ -278,6 +298,136 @@ $('monBtn').onclick = () => {
   const p = r.split(',').map(x => x.trim().toLowerCase()).filter(Boolean); if (p.length !== 2) return toast('Enter exactly two usernames');
   openChat('dm', p.sort().join('__'), 'Monitoring · ' + nm(p[0]) + ' & ' + nm(p[1]));
 };
+
+/* ---------- voice calls (WebRTC, signaling through Firestore) ---------- */
+let pc = null, localStream = null, callRef = null, callUnsubs = [], pendingICE = [], callRole = '', callPeer = '';
+let callStart = 0, callTimer = null, callTimeout = null, incomingOffer = null, ac = null, ringT = null, titleT = null, iceCache = null, iceAt = 0;
+const fmt = s => Math.floor(s/60) + ':' + String(s % 60).padStart(2,'0');
+
+async function getIce(){
+  if (iceCache && Date.now() - iceAt < 1800000) return iceCache;
+  let list = [{urls:'stun:stun.l.google.com:19302'}, {urls:'stun:stun1.l.google.com:19302'}];
+  if (WORKER_URL && auth.currentUser) {
+    try {
+      const idToken = await auth.currentUser.getIdToken(), ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 3000);
+      const r = await fetch(WORKER_URL, {method:'POST', signal:ctl.signal, headers:{'Content-Type':'application/json'}, body:JSON.stringify({idToken, action:'turn'})});
+      clearTimeout(t);
+      const turn = r.ok ? await r.json() : [];
+      if (Array.isArray(turn) && turn.length) list = list.concat(turn);
+    } catch {}
+  }
+  iceCache = list; iceAt = Date.now(); return list;
+}
+function ring(kind){
+  stopRing();
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume();
+    const beep = () => { const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+      o.frequency.value = kind === 'in' ? 880 : 440; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.25, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      o.start(t); o.stop(t + 0.8); if (kind === 'in' && navigator.vibrate) navigator.vibrate([300,150,300]); };
+    beep(); ringT = setInterval(beep, kind === 'in' ? 1600 : 3000);
+  } catch {}
+}
+function stopRing(){ clearInterval(ringT); ringT = null; try { navigator.vibrate && navigator.vibrate(0); } catch {} }
+function flashTitle(on, who){
+  clearInterval(titleT); document.title = 'NEON CHAT';
+  if (on) { let f = 0; titleT = setInterval(() => { document.title = (f ^= 1) ? '📞 ' + who + ' calling…' : 'NEON CHAT'; }, 800); }
+}
+function showCallUI(peer, status, incoming){
+  $('callName').textContent = nm(peer); $('callAvatar').textContent = nm(peer).charAt(0).toUpperCase();
+  $('callStatus').textContent = status; $('callUI').style.display = 'flex';
+  $('acceptBtn').style.display = incoming ? 'flex' : 'none';
+  $('muteBtn').style.display = incoming ? 'none' : 'flex'; $('muteBtn').textContent = 'Mute';
+  $('hangBtn').textContent = incoming ? 'Decline' : 'Hang up';
+}
+async function setupPC(){
+  const iceServers = await getIce();
+  localStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true, noiseSuppression:true}});
+  pc = new RTCPeerConnection({iceServers}); pendingICE = [];
+  localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+  pc.ontrack = e => { $('remoteA').srcObject = e.streams[0]; };
+  pc.onicecandidate = e => { if (e.candidate && callRef)
+    addDoc(collection(callRef, callRole === 'caller' ? 'callerCandidates' : 'calleeCandidates'), e.candidate.toJSON()).catch(() => {}); };
+  pc.onconnectionstatechange = () => {
+    const s = pc && pc.connectionState;
+    if (s === 'connected') { stopRing(); if (!callStart) { callStart = Date.now(); callTimer = setInterval(tick, 1000); tick(); } }
+    if (s === 'failed') { toast('Call could not connect'); endCall(true); }
+  };
+}
+function tick(){ $('callStatus').textContent = fmt(Math.floor((Date.now() - callStart) / 1000)); }
+async function addCandidate(c){ if (pc && pc.remoteDescription) await pc.addIceCandidate(c).catch(() => {}); else pendingICE.push(c); }
+async function flushICE(){ const l = pendingICE; pendingICE = []; for (const c of l) await pc.addIceCandidate(c).catch(() => {}); }
+function watchCandidates(sub){
+  callUnsubs.push(onSnapshot(collection(callRef, sub), s => s.docChanges().forEach(c => { if (c.type === 'added') addCandidate(c.doc.data()); })));
+}
+function watchCallState(){
+  const ref = callRef;
+  callUnsubs.push(onSnapshot(ref, async s => {
+    const d = s.data(); if (!d || callRef !== ref) return;
+    if (callRole === 'caller' && d.answer && pc && !pc.remoteDescription) {
+      try { await pc.setRemoteDescription(d.answer); flushICE(); stopRing(); $('callStatus').textContent = 'Connecting…'; } catch {}
+    }
+    if (d.status === 'ended' || d.status === 'declined') { if (d.status === 'declined') toast(nm(callPeer) + ' declined'); endCall(false); }
+  }));
+}
+
+async function startCall(){
+  if (pc || callRef || chat.kind !== 'dm' || !chat.id.split('__').includes(me)) return;
+  const dmId = chat.id, ref = doc(collection(db, 'calls'));
+  callPeer = dmId.split('__').find(x => x !== me); callRole = 'caller'; callRef = ref;
+  showCallUI(callPeer, 'Calling…', false); ring('out');
+  try { await setupPC(); } catch { toast('Allow the microphone to make calls'); return endCall(false, false); }
+  if (callRef !== ref) return;
+  const offer = await pc.createOffer();
+  await setDoc(ref, {from:me, to:callPeer, status:'ringing', ts:serverTimestamp(), offer:{type:offer.type, sdp:offer.sdp}});  // before candidates start
+  if (callRef !== ref) return;
+  await pc.setLocalDescription(offer);
+  pingWorker({kind:'call', id:dmId}, '');
+  watchCandidates('calleeCandidates'); watchCallState();
+  callTimeout = setTimeout(() => { if (callRef === ref && !callStart) { toast('No answer'); endCall(true); } }, 45000);
+}
+
+function showIncoming(snap){
+  const d = snap.data();
+  if (d.ts && Date.now() - d.ts.toMillis() > 45000) return;                    // stale
+  if (callRef) { updateDoc(snap.ref, {status:'declined'}).catch(() => {}); return; }   // already busy
+  callRef = snap.ref; callRole = 'callee'; callPeer = d.from; incomingOffer = d.offer;
+  showCallUI(d.from, 'Incoming voice call…', true); ring('in'); flashTitle(true, nm(d.from)); watchCallState();
+  if (document.hidden && typeof Notification !== 'undefined' && Notification.permission === 'granted' && !(WORKER_URL && localStorage.getItem('fcmToken')))
+    navigator.serviceWorker?.getRegistration().then(r => r && r.showNotification('📞 ' + nm(d.from) + ' is calling', {body:'Incoming voice call', tag:'call' + snap.id, requireInteraction:true})).catch(() => {});
+  const ref = snap.ref; callTimeout = setTimeout(() => { if (callRef === ref && !pc) endCall(false, false); }, 45000);
+}
+async function acceptCall(){
+  const ref = callRef; stopRing(); flashTitle(false); clearTimeout(callTimeout);
+  showCallUI(callPeer, 'Connecting…', false); $('hangBtn').textContent = 'Hang up';
+  try { await setupPC(); } catch { toast('Allow the microphone to answer calls'); updateDoc(ref, {status:'declined'}).catch(() => {}); return endCall(false, false); }
+  if (callRef !== ref || !pc) return;
+  await pc.setRemoteDescription(incomingOffer); flushICE();
+  const ans = await pc.createAnswer(); await pc.setLocalDescription(ans);
+  await updateDoc(ref, {answer:{type:ans.type, sdp:ans.sdp}, status:'active'});
+  watchCandidates('callerCandidates');
+}
+
+async function endCall(notify = true, log = true){
+  const ref = callRef, role = callRole, peer = callPeer, dur = callStart ? Math.round((Date.now() - callStart) / 1000) : 0;
+  callRef = null; callRole = ''; callPeer = ''; callStart = 0; incomingOffer = null;
+  clearInterval(callTimer); clearTimeout(callTimeout); stopRing(); flashTitle(false);
+  callUnsubs.forEach(f => f()); callUnsubs = [];
+  if (localStream) localStream.getTracks().forEach(t => t.stop()); localStream = null;
+  if (pc) { pc.onconnectionstatechange = null; pc.close(); pc = null; }
+  $('remoteA').srcObject = null; $('callUI').style.display = 'none';
+  if (ref && notify) updateDoc(ref, {status:'ended'}).catch(() => {});
+  if (ref && log && role === 'caller' && auth.currentUser)      // the caller writes one history line per call
+    addDoc(collection(db, 'dms', [me, peer].sort().join('__'), 'messages'),
+      {from:me, name:nm(me), text: dur ? '📞 Voice call · ' + fmt(dur) : '📞 Missed call', ts:serverTimestamp()}).catch(() => {});
+}
+$('callBtn').onclick = startCall;
+$('acceptBtn').onclick = acceptCall;
+$('hangBtn').onclick = () => {
+  if (callRole === 'callee' && !pc) { updateDoc(callRef, {status:'declined'}).catch(() => {}); endCall(false, false); } else endCall(true);
+};
+$('muteBtn').onclick = () => { const t = localStream && localStream.getAudioTracks()[0]; if (t) { t.enabled = !t.enabled; $('muteBtn').textContent = t.enabled ? 'Mute' : 'Unmute'; } };
 
 /* ---------- notifications ---------- */
 let messaging = null;

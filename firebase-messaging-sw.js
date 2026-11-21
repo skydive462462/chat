@@ -19,7 +19,8 @@ messaging.onBackgroundMessage((payload) => {
   return self.registration.showNotification(d.title || 'New message', {
     body: d.body || '',
     tag: d.tag || 'chat',   // same tag as the in-app alert, so no duplicates
-    renotify: true
+    renotify: true,
+    requireInteraction: (d.tag || '').startsWith('call')   // incoming-call alerts stay until tapped
   });
 });
 
