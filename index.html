@@ -50,6 +50,20 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
 .mention{color:var(--grad-1);font-weight:800}.mention.me{background:rgba(255,0,204,.2);border-radius:6px;padding:0 4px}
 .del{position:absolute;top:6px;right:6px;padding:0 7px;font-size:11px;border-width:1px;border-color:#ff4b2b;color:#ff4b2b;border-radius:8px}
 #sendbar{display:flex;gap:10px;padding:14px;border-top:1px solid var(--neon-border)}
+.msg time{margin-right:2px}.edited{color:#777;font-size:10px}
+.quote{margin:5px 0 2px;padding:5px 8px;border-left:3px solid var(--grad-1);background:rgba(255,255,255,.06);border-radius:6px;font-size:12px;cursor:pointer;color:#bbb;overflow:hidden}
+.quote span:first-child{color:var(--grad-1);font-weight:800;margin-right:6px}
+.tick{text-align:right;font-size:11px;color:#777;margin-top:2px;user-select:none}.tick.seen{color:var(--neon-green);text-shadow:0 0 6px rgba(0,255,204,.6)}
+.acts{display:none;gap:6px;margin-top:4px}.msg.open .acts{display:flex}
+@media(hover:hover){.msg:hover .acts{display:flex}}
+.acts button{padding:1px 9px;font-size:14px;border-width:1px;border-radius:8px;text-transform:none;letter-spacing:0}
+.acts button:hover{transform:none;box-shadow:none}
+.msg.flash{animation:flash 1.2s}@keyframes flash{0%,60%{box-shadow:0 0 0 2px var(--grad-1),0 0 20px var(--grad-1)}100%{box-shadow:none}}
+#replyBar{display:none;align-items:center;gap:10px;padding:8px 14px;border-top:1px solid var(--neon-border);background:rgba(255,0,204,.07);font-size:12px;color:#ccc}
+#replyTxt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#replyX{padding:2px 9px;font-size:12px;border-color:#ff4b2b;color:#ff4b2b}
+.pdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;margin-right:7px}
+#chatSub{text-transform:none;font-weight:700;margin-left:8px;color:#888}#chatSub.on{color:#00e676}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0a0a19;border:2px solid var(--neon-green);padding:12px 22px;border-radius:14px;font-weight:700;display:none;z-index:200;box-shadow:0 0 30px rgba(0,255,204,.4)}
 #callUI{position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(5,5,16,.97);backdrop-filter:blur(20px);padding:20px;text-align:center}
 #callAvatar{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:900;background:linear-gradient(135deg,var(--grad-1),var(--grad-3));animation:ringPulse 1.6s infinite}
@@ -77,6 +91,7 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
     <div class="logo">NEON // CHAT</div>
     <div class="tool-bar">
       <span id="whoami"></span>
+      <button id="adminToggle" class="btn-back" style="display:none"></button>
       <button id="notifBtn" class="btn-back">Enable notifications</button>
       <button class="btn-clear admin-only" id="clearBtn" style="display:none">Clear history</button>
       <button class="btn-clear admin-only" id="kickAllBtn" style="display:none">Log out others</button>
@@ -90,8 +105,9 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
       <div id="members"></div>
     </div>
     <div class="panel">
-      <div class="panel-header"><span id="chatTitle">Group chat</span><span style="display:flex;gap:10px;align-items:center"><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
+      <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
       <div id="msgs"></div>
+      <div id="replyBar"><span id="replyTxt"></span><button id="replyX">✕</button></div>
       <div id="sendbar">
         <input id="msgIn" placeholder="Message… use @username to notify someone" autocomplete="off">
         <button id="sendBtn">Send</button>
@@ -155,6 +171,8 @@ const nm = u => NAMES[u] || u;
 const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let me = '', isAdmin = false, chat = {kind:'group', id:'', label:'Group chat'}, profiles = [], unsubs = [], unsubChat = null;
 const dmWatch = new Map();
+let adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
+const EDIT_MS = 15 * 60 * 1000;
 
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
 
@@ -170,6 +188,7 @@ $('outBtn').onclick = logout;
 async function logout(){
   if (callRef) endCall(true, false);
   try { const t = localStorage.getItem('fcmToken'); if (t && me) await setDoc(doc(db,'tokens',me), {tokens:arrayRemove(t)}, {merge:true}); } catch {}
+  try { if (me) await setDoc(doc(db,'presence',me), {online:false, t:serverTimestamp()}); } catch {}
   localStorage.removeItem('fcmToken'); signOut(auth);
 }
 
@@ -177,13 +196,18 @@ onAuthStateChanged(auth, async user => {
   if (callRef || pc) endCall(true, false);
   unsubs.forEach(f => f()); unsubs = []; if (unsubChat) unsubChat();
   dmWatch.forEach(f => f()); dmWatch.clear();
+  if (unsubReads) { unsubReads(); unsubReads = null; } clearInterval(hbT); presence = {};
   if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
   me = user.email.split('@')[0].toLowerCase();
   isAdmin = user.email.toLowerCase() === ADMIN_EMAIL;
   $('login').style.display = 'none'; $('app').style.display = 'flex'; $('p').value = '';
-  $('whoami').textContent = nm(me) + (isAdmin ? ' (admin)' : '');
-  document.querySelectorAll('.admin-only').forEach(b => b.style.display = isAdmin ? 'flex' : 'none');
+  adminOn = isAdmin && localStorage.getItem('adminOn') !== '0'; applyAdminUI();
   await setDoc(doc(db,'users',me), {name:nm(me), email:user.email}, {merge:true});
+  beat(true); hbT = setInterval(() => { if (!document.hidden) beat(true); }, 60000);
+  unsubs.push(onSnapshot(collection(db,'presence'), s => {
+    presence = {}; s.forEach(d => { const v = d.data(); presence[d.id] = {online:!!v.online, t: v.t && v.t.toMillis ? v.t.toMillis() : Date.now()}; });
+    updateHeader(); drawMembers();
+  }, () => {}));
   unsubs.push(onSnapshot(collection(db,'users'), s => { profiles = s.docs.map(d => d.id); drawMembers(); }));
   let first = true;   // remote log-out: reacts only to changes made after we logged in
   unsubs.push(onSnapshot(doc(db,'control','logout'), s => {
@@ -210,18 +234,18 @@ function drawMembers(){
   const list = [...new Set([...Object.keys(NAMES), ...profiles])].filter(u => u !== me).sort();
   watchDMs(list);
   const box = $('members'); box.innerHTML = '';
-  const add = (label, sub, active, fn, kickUser) => {
+  const add = (label, sub, active, fn, kickUser, online) => {
     const el = document.createElement('div'); el.className = 'mem' + (active ? ' active' : '');
     const l = document.createElement('span'); l.textContent = label;
-    const s = document.createElement('small'); s.textContent = sub; l.append(' ', s); el.append(l);
-    if (kickUser && isAdmin) { const k = document.createElement('button'); k.className='kick'; k.textContent='Kick';
+    const s = document.createElement('small'); s.textContent = sub; l.append(' ', s); if (online) { const d = document.createElement('i'); d.className = 'pdot'; l.prepend(d); } el.append(l);
+    if (kickUser && adm()) { const k = document.createElement('button'); k.className='kick'; k.textContent='Kick';
       k.onclick = ev => { ev.stopPropagation(); setDoc(doc(db,'control','logout'), {target:kickUser, at:Date.now()}); toast(nm(kickUser)+' logged out'); };
       el.append(k); }
     el.onclick = fn; box.append(el);
   };
   add('# Group chat', '', chat.kind==='group', () => openChat('group','','Group chat'));
   list.forEach(u => { const id = [me,u].sort().join('__');
-    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u); });
+    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u, isOnline(u)); });
 }
 
 /* ---------- in-app alerts (free, work while the site is open) ---------- */
@@ -251,41 +275,146 @@ async function pingWorker(c, text){
 
 /* ---------- chat ---------- */
 const colRef = () => chat.kind==='group' ? collection(db,'group') : collection(db,'dms',chat.id,'messages');
+const canSendIn = (k, id) => k === 'group' || id.split('__').includes(me);
+const readId = () => chat.kind === 'group' ? 'group' : chat.id;
+const tms = v => v && v.toMillis ? v.toMillis() : 0;
+const ago = t => { const m = Math.floor((Date.now() - t) / 60000); if (m < 1) return 'just now'; if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60); return h < 24 ? h + ' h ago' : new Date(t).toLocaleDateString(); };
+
+/* presence */
+const isOnline = u => { const p = presence[u]; return !!(p && p.online && Date.now() - p.t < 90000); };
+function beat(on){ if (!me || !auth.currentUser) return; setDoc(doc(db,'presence',me), {online:on, t:serverTimestamp()}).catch(() => {}); }
+function updateHeader(){
+  const s = $('chatSub'); s.textContent = ''; s.className = '';
+  if (chat.kind !== 'dm' || !chat.id.split('__').includes(me)) return;
+  const peer = chat.id.split('__').find(x => x !== me), p = presence[peer];
+  if (isOnline(peer)) { s.textContent = '● online'; s.className = 'on'; }
+  else if (p && p.t) s.textContent = 'last seen ' + ago(p.t);
+}
+document.addEventListener('visibilitychange', () => { if (!me || !auth.currentUser) return; if (document.hidden) beat(false); else { beat(true); markRead(); } });
+addEventListener('pagehide', () => beat(false));
+setInterval(() => { if (me && auth.currentUser) { updateHeader(); drawMembers(); } }, 30000);
+
+/* reply / edit bar */
+function setBar(){
+  const bar = $('replyBar');
+  if (editing) { bar.style.display = 'flex'; $('replyTxt').textContent = '✏ Editing message'; }
+  else if (replyTo) { bar.style.display = 'flex'; $('replyTxt').textContent = '↩ Replying to ' + replyTo.name + ': ' + replyTo.text; }
+  else bar.style.display = 'none';
+}
+function clearCompose(){ replyTo = null; editing = null; setBar(); }
+$('replyX').onclick = () => { if (editing) $('msgIn').value = ''; clearCompose(); };
+function startReply(id, m){ editing = null; replyTo = {id, name: m.name || m.from, text: String(m.text || '').slice(0, 80)}; setBar(); $('msgIn').focus(); }
+function startEdit(d, m){ replyTo = null; editing = {ref: d.ref, old: m.text}; $('msgIn').value = m.text; setBar(); $('msgIn').focus(); }
+function jumpTo(id){
+  const el = $('msgs').querySelector('[data-id="' + id + '"]');
+  if (!el) return toast('Original message is not loaded');
+  el.scrollIntoView({behavior:'smooth', block:'center'}); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+}
+
+/* seen */
+function markRead(){
+  if (adm() || document.hidden || !auth.currentUser || !canSendIn(chat.kind, chat.id) || !lastDocs.length) return;   // admin mode ON = invisible, reads nothing
+  const newest = Math.max(0, ...lastDocs.map(d => d.data()).filter(m => m.from !== me).map(m => tms(m.ts)));
+  if (!newest || newest <= tms(readsData[me])) return;
+  if (Date.now() - readTimer < 3000) { clearTimeout(markRead.t); markRead.t = setTimeout(markRead, 3000); return; }
+  readTimer = Date.now();
+  setDoc(doc(db,'reads',readId()), {[me]: serverTimestamp()}, {merge:true}).catch(() => {});
+}
+function tickEl(m){
+  const s = document.createElement('div'); s.className = 'tick'; const ts = tms(m.ts);
+  if (!m.ts) { s.textContent = '🕒'; return s; }                       // not on the server yet
+  if (chat.kind === 'dm') {
+    const peer = chat.id.split('__').find(x => x !== me), seen = tms(readsData[peer]) >= ts;
+    s.textContent = seen ? '✓✓' : '✓'; if (seen) s.classList.add('seen');
+  } else {
+    const names = Object.keys(readsData).filter(u => u !== me && tms(readsData[u]) >= ts);
+    if (!names.length) s.textContent = '✓';
+    else { s.textContent = '👁 ' + names.length; s.classList.add('seen'); s.style.cursor = 'pointer';
+      s.onclick = ev => { ev.stopPropagation(); toast('Seen by: ' + names.map(nm).join(', ')); }; }
+  }
+  return s;
+}
+
+function render(){
+  const box = $('msgs'), top = box.scrollTop, near = box.scrollHeight - top - box.clientHeight < 80, canSend = canSendIn(chat.kind, chat.id);
+  box.innerHTML = '';
+  lastDocs.forEach(d => {
+    const m = d.data(), mine = m.from === me, el = document.createElement('div');
+    el.className = 'msg' + (mine ? ' mine' : '') + (openMsg === d.id ? ' open' : ''); el.dataset.id = d.id;
+    const who = document.createElement('b'); who.textContent = m.name || m.from;
+    who.onclick = ev => { if (chat.kind==='group' && m.from!==me) { ev.stopPropagation(); $('msgIn').value += '@'+m.from+' '; $('msgIn').focus(); } };
+    const t = document.createElement('time'); t.textContent = m.ts ? m.ts.toDate().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '…';
+    el.append(who, t);
+    if (m.edited) { const e = document.createElement('small'); e.className = 'edited'; e.textContent = ' (edited)'; el.append(e); }
+    if (m.reply) {
+      const q = document.createElement('div'); q.className = 'quote';
+      const qn = document.createElement('span'), qt = document.createElement('span'); qn.textContent = m.reply.name; qt.textContent = m.reply.text;
+      q.append(qn, qt); q.onclick = ev => { ev.stopPropagation(); jumpTo(m.reply.id); }; el.append(q);
+    }
+    const tx = document.createElement('div'); tx.className = 'txt';
+    tx.innerHTML = esc(m.text).replace(/@(\w+)/g, (_,n) => `<span class="mention${n.toLowerCase()===me?' me':''}">@${n}</span>`);
+    el.append(tx);
+    if (mine) el.append(tickEl(m));
+    if (canSend) {
+      const a = document.createElement('div'); a.className = 'acts';
+      const mk = (ic, title, fn) => { const bt = document.createElement('button'); bt.textContent = ic; bt.title = title; bt.onclick = ev => { ev.stopPropagation(); fn(); }; a.append(bt); };
+      mk('↩', 'Reply', () => startReply(d.id, m));
+      if (mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS))) mk('✏', 'Edit', () => startEdit(d, m));
+      el.append(a);
+    }
+    el.onclick = () => { openMsg = openMsg === d.id ? null : d.id; box.querySelectorAll('.msg').forEach(x => x.classList.toggle('open', x.dataset.id === openMsg)); };
+    if (adm()) { const x = document.createElement('button'); x.className='del'; x.textContent='✕'; x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); }; el.append(x); }
+    box.append(el);
+  });
+  if (justOpened || near) { box.scrollTop = box.scrollHeight; if (lastDocs.length) justOpened = false; } else box.scrollTop = top;
+}
 
 function openChat(kind, id, label){
   chat = {kind, id, label}; $('chatTitle').textContent = label; drawMembers();
-  const canSend = kind==='group' || id.split('__').includes(me);
+  const canSend = canSendIn(kind, id);
   $('msgIn').disabled = $('sendBtn').disabled = !canSend;
   $('callBtn').style.display = (kind === 'dm' && id.split('__').includes(me)) ? 'flex' : 'none';
   $('msgIn').placeholder = canSend ? 'Message… use @username to notify someone' : 'Read-only (admin monitor)';
-  if (unsubChat) unsubChat();
-  unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => {
-    const box = $('msgs'); box.innerHTML = '';
-    snap.forEach(d => {
-      const m = d.data(), el = document.createElement('div'); el.className = 'msg' + (m.from===me ? ' mine' : '');
-      const who = document.createElement('b'); who.textContent = m.name || m.from;
-      who.onclick = () => { if (chat.kind==='group' && m.from!==me) { $('msgIn').value += '@'+m.from+' '; $('msgIn').focus(); } };
-      const t = document.createElement('time'); t.textContent = m.ts ? m.ts.toDate().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '…';
-      const tx = document.createElement('div'); tx.className = 'txt';
-      tx.innerHTML = esc(m.text).replace(/@(\w+)/g, (_,n) => `<span class="mention${n.toLowerCase()===me?' me':''}">@${n}</span>`);
-      el.append(who, t, tx);
-      if (isAdmin) { const x = document.createElement('button'); x.className='del'; x.textContent='✕'; x.onclick = () => deleteDoc(d.ref); el.append(x); }
-      box.append(el);
-    });
-    box.scrollTop = box.scrollHeight;
-  }, err => toast('Cannot open this chat: ' + err.code));
+  if (editing) $('msgIn').value = '';
+  clearCompose(); openMsg = null; lastDocs = []; readsData = {}; justOpened = true; updateHeader(); $('msgs').innerHTML = '';
+  if (unsubChat) unsubChat(); if (unsubReads) { unsubReads(); unsubReads = null; }
+  if (canSend) unsubReads = onSnapshot(doc(db,'reads',readId()), s => { readsData = s.data() || {}; render(); markRead(); }, () => {});
+  unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => { lastDocs = snap.docs; render(); markRead(); },
+    err => toast('Cannot open this chat: ' + err.code));
 }
 
 async function send(){
-  const text = $('msgIn').value.trim(); if (!text) return; $('msgIn').value = '';
-  const c = chat;
-  try { await addDoc(colRef(), {from:me, name:nm(me), text, ts:serverTimestamp()}); pingWorker(c, text); }
+  const text = $('msgIn').value.trim(); if (!text) return;
+  if (editing) {                                                   // edits never send a push notification
+    const e = editing; $('msgIn').value = ''; clearCompose();
+    if (text === e.old) return;
+    try { await updateDoc(e.ref, {text, edited:true}); }
+    catch (err) { toast(err.code === 'permission-denied' ? 'Edit failed: the 15-minute edit time is over' : 'Edit failed: ' + err.code); }
+    return;
+  }
+  $('msgIn').value = ''; const c = chat, r = replyTo; clearCompose();
+  const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r;
+  try { await addDoc(colRef(), data); pingWorker(c, text); }
   catch (e) { toast('Send failed: ' + e.code); }
 }
 $('sendBtn').onclick = send;
 $('msgIn').onkeydown = e => { if (e.key === 'Enter') send(); };
 
 /* ---------- admin ---------- */
+function adm(){ return isAdmin && adminOn; }
+function applyAdminUI(fromToggle){
+  $('whoami').textContent = nm(me) + (adm() ? ' (admin)' : '');
+  document.querySelectorAll('.admin-only').forEach(b => b.style.display = adm() ? 'flex' : 'none');
+  const t = $('adminToggle'); t.style.display = isAdmin ? 'flex' : 'none'; t.textContent = 'Admin: ' + (adminOn ? 'ON' : 'OFF');
+  if (!fromToggle) return;
+  if (!adm() && chat.kind === 'dm' && !chat.id.split('__').includes(me)) return openChat('group', '', 'Group chat');   // leave monitor view
+  drawMembers(); render(); markRead();
+}
+$('adminToggle').onclick = () => {
+  adminOn = !adminOn; localStorage.setItem('adminOn', adminOn ? '1' : '0'); applyAdminUI(true);
+  toast(adminOn ? 'Admin mode ON' : 'Admin mode OFF: you appear as a normal user');
+};
 $('clearBtn').onclick = async () => {
   if (!confirm('Delete ALL messages in "' + chat.label + '"?')) return;
   const s = await getDocs(colRef()); let b = writeBatch(db), n = 0;
