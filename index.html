@@ -75,6 +75,20 @@ select{background:rgba(255,255,255,.05);color:var(--neon-green);border:2px solid
 select:focus{border-color:var(--neon-green)}option{background:#0a0a19;color:#fff}
 #typingBar{display:none;padding:2px 18px 6px;font-size:12px;color:var(--grad-3);font-weight:700;font-style:italic}
 .badge{background:var(--grad-1);color:#fff;border-radius:11px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:8px;box-shadow:0 0 10px rgba(255,0,204,.6)}
+#msgWrap{position:relative;flex:1;min-height:0;display:flex}#msgWrap #msgs{flex:1;min-width:0}
+#jumpBtn{display:none;position:absolute;right:16px;bottom:12px;padding:6px 14px;border-radius:20px;font-size:12px;background:rgba(10,10,25,.95);border-color:var(--grad-3);color:var(--grad-3);z-index:5}
+.dsep{align-self:center;font-size:11px;font-weight:800;color:#888;background:rgba(255,255,255,.05);border:1px solid var(--neon-border);border-radius:12px;padding:2px 12px;margin:6px 0;letter-spacing:.5px;text-transform:uppercase}
+.txt.gone{color:#777;font-style:italic}.txt a{color:var(--grad-3);text-decoration:underline;word-break:break-all}
+.fxtag{font-size:10px;color:var(--grad-1);cursor:pointer;font-weight:800}.starmark{font-size:11px}
+#suggest{display:none;flex-wrap:wrap;gap:6px;padding:8px 14px;border-top:1px solid var(--neon-border);background:rgba(255,255,255,.03);max-height:110px;overflow:auto}
+#suggest .sg{padding:5px 12px;font-size:12px;border-width:1px;border-radius:14px;text-transform:none;letter-spacing:0}#suggest .sg.on{background:var(--neon-green);color:#000}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:175}
+@keyframes quake{0%,100%{transform:none}10%{transform:translate(-14px,8px)}20%{transform:translate(12px,-10px)}30%{transform:translate(-10px,-6px)}40%{transform:translate(14px,6px)}50%{transform:translate(-8px,10px)}60%{transform:translate(10px,-8px)}70%{transform:translate(-12px,4px)}80%{transform:translate(6px,-4px)}90%{transform:translate(-4px,2px)}}
+@keyframes glitch{0%,100%{filter:none;transform:none}10%{filter:hue-rotate(90deg) drop-shadow(5px 0 #f0f) drop-shadow(-5px 0 #0ff);transform:translate(-8px,2px) skewX(5deg)}20%{filter:invert(1);transform:translate(8px,-3px)}30%{filter:hue-rotate(200deg) contrast(1.7);transform:translate(-4px,5px) skewX(-6deg)}45%{filter:none;transform:none}55%{filter:saturate(4) drop-shadow(-6px 0 #f00) drop-shadow(6px 0 #00f);transform:translate(10px,0) skewX(3deg)}70%{filter:invert(1) hue-rotate(120deg);transform:translate(-6px,-4px)}85%{filter:contrast(2);transform:translate(3px,3px) skewX(-2deg)}}
+#app.quake{animation:quake .9s}#app.glitch{animation:glitch 1.4s steps(2,end)}
+.opt{width:100%;margin:5px 0;padding:14px;font-size:13px}.opt.on{background:var(--neon-green);color:#000}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.sw{height:70px;border-radius:14px;border:2px solid var(--neon-border);color:#fff;text-shadow:0 1px 4px #000;font-size:12px}.sw.on{border-color:#fff}
 #adminBar{display:none;gap:10px;padding:8px 24px;background:rgba(255,0,100,.06);border-bottom:1px solid var(--neon-border);flex-wrap:wrap}
 #annBar{display:none;padding:9px 18px;background:rgba(255,200,0,.1);border-bottom:1px solid rgba(255,200,0,.35);color:#ffd54a;font-size:13px;font-weight:700;word-break:break-word}
 #pinBar{display:none;align-items:center;gap:10px;padding:8px 18px;background:rgba(0,212,255,.07);border-bottom:1px solid var(--neon-border);font-size:12px;color:#cfefff}
@@ -135,6 +149,9 @@ select:focus{border-color:var(--neon-green)}option{background:#0a0a19;color:#fff
     <div class="tool-bar">
       <span id="whoami"></span>
       <button id="adminToggle" class="btn-back" style="display:none"></button>
+      <button id="starsBtn" class="btn-back">⭐ Saved</button>
+      <button id="soundBtn" class="btn-back">🔔 Alert</button>
+      <button id="themeBtn" class="btn-back">🎨 Theme</button>
       <button id="notifBtn" class="btn-back">Enable notifications</button>
       <button class="btn-clear" id="outBtn">Log out</button>
     </div>
@@ -155,9 +172,10 @@ select:focus{border-color:var(--neon-green)}option{background:#0a0a19;color:#fff
       <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="toolsBtn" class="btn-back admin-only" style="display:none;padding:5px 12px">🛠 Tools</button><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
       <div id="annBar"></div>
       <div id="pinBar"><span id="pinTxt"></span><button id="unpinBtn">✕</button></div>
-      <div id="msgs"></div>
+      <div id="msgWrap"><div id="msgs"></div><button id="jumpBtn">⬇</button></div>
       <div id="typingBar"></div>
       <div id="replyBar"><span id="replyTxt"></span><button id="replyX">✕</button></div>
+      <div id="suggest"></div>
       <div id="sendbar">
         <input id="msgIn" placeholder="Message… use @username to notify someone" autocomplete="off">
         <button id="sendBtn">Send</button>
@@ -175,6 +193,7 @@ select:focus{border-color:var(--neon-green)}option{background:#0a0a19;color:#fff
   </div>
 </div>
 <div id="modal"><div class="card"><div class="mh"><span id="mTitle"></span><button id="mX" class="btn-clear">✕</button></div><div id="mBody"></div></div></div>
+<canvas id="fx"></canvas>
 <div id="toast"></div>
 
 <script type="module">
@@ -222,9 +241,9 @@ const nm = u => NAMES[u] || u;
 const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let me = '', isAdmin = false, chat = {kind:'group', id:'', label:'Group chat'}, profiles = [], unsubs = [], unsubChat = null;
 const dmWatch = new Map();
-let typingData = {}, unsubTyping = null, lastTypingWrite = 0, unread = {}, lastReadOf = {}, settings = {}, unsubSet = null, modalKind = '', adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
+let starred = new Map(), newBelow = 0, lastRenderedId = '', pendingJump = '', sugItems = [], sugIdx = 0, dingCtx = null, lastDing = 0, curTheme = 'neon', typingData = {}, unsubTyping = null, lastTypingWrite = 0, unread = {}, lastReadOf = {}, settings = {}, unsubSet = null, modalKind = '', adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
 const EDIT_MS = 15 * 60 * 1000;
-const unreadWatch = new Map();
+const unreadWatch = new Map(), playedFx = new Set();
 
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
 
@@ -249,7 +268,7 @@ onAuthStateChanged(auth, async user => {
   unsubs.forEach(f => f()); unsubs = []; if (unsubChat) unsubChat();
   dmWatch.forEach(f => f()); dmWatch.clear();
   if (unsubReads) { unsubReads(); unsubReads = null; } if (unsubSet) { unsubSet(); unsubSet = null; } if (unsubTyping) { unsubTyping(); unsubTyping = null; }
-  unreadWatch.forEach(f => f()); unreadWatch.clear(); unread = {}; lastReadOf = {}; typingData = {}; clearInterval(hbT); presence = {};
+  unreadWatch.forEach(f => f()); unreadWatch.clear(); unread = {}; lastReadOf = {}; typingData = {}; starred = new Map(); clearInterval(hbT); presence = {};
   if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
   me = user.email.split('@')[0].toLowerCase();
   isAdmin = user.email.toLowerCase() === ADMIN_EMAIL;
@@ -261,7 +280,12 @@ onAuthStateChanged(auth, async user => {
     presence = {}; s.forEach(d => { const v = d.data(); presence[d.id] = {online:!!v.online, t: v.t && v.t.toMillis ? v.t.toMillis() : Date.now()}; });
     updateHeader(); drawMembers();
   }, () => {}));
-  unsubs.push(onSnapshot(collection(db,'users'), s => { profiles = s.docs.map(d => d.id); drawMembers(); }));
+  unsubs.push(onSnapshot(collection(db,'users'), s => {
+    profiles = s.docs.map(d => d.id); drawMembers();
+    const mine = s.docs.find(d => d.id === me), tk = mine && mine.data().theme;
+    if (tk && tk !== curTheme && THEMES[tk]) { applyTheme(tk); localStorage.setItem('theme', tk); }
+  }));
+  unsubs.push(onSnapshot(collection(db,'stars',me,'items'), s => { starred = new Map(s.docs.map(x => [x.id, x.data()])); render(); if (modalKind === 'stars') renderStars(); }, () => {}));
   let first = true;   // remote log-out: reacts only to changes made after we logged in
   unsubs.push(onSnapshot(doc(db,'control','logout'), s => {
     if (first) { first = false; return; }
@@ -277,7 +301,7 @@ onAuthStateChanged(auth, async user => {
   let gFirst = true; const mention = new RegExp('@' + me.replace(/[^\w]/g, '\\$&') + '(?!\\w)', 'i');
   unsubs.push(onSnapshot(query(collection(db,'group'), orderBy('ts','desc'), limit(1)), s => {
     if (gFirst) { gFirst = false; return; }
-    s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) bump('group'); if (m.from !== me && mention.test(m.text || '')) alertUser(m.name + ' mentioned you', m.text, 'group', ''); } });
+    s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) { bump('group'); ding(); } if (m.from !== me && mention.test(m.text || '')) alertUser(m.name + ' mentioned you', m.text, 'group', ''); } });
   }, () => {}));
   // incoming voice calls
   unsubs.push(onSnapshot(query(collection(db,'calls'), where('to','==',me), where('status','==','ringing')),
@@ -313,7 +337,7 @@ function watchDMs(list){
     const id = [me,u].sort().join('__'); if (dmWatch.has(id)) return; let first = true;
     dmWatch.set(id, onSnapshot(query(collection(db,'dms',id,'messages'), orderBy('ts','desc'), limit(1)), s => {
       if (first) { first = false; return; }
-      s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) bump(id); if (m.from !== me) alertUser(m.name + ' (private)', m.text, 'dm', id); } });
+      s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) { bump(id); ding(); } if (m.from !== me) alertUser(m.name + ' (private)', m.text, 'dm', id); } });
     }, () => {}));
   });
 }
@@ -444,6 +468,173 @@ $('msgIn').addEventListener('input', () => {
   setDoc(doc(db,'typing',readId()), {[me]: serverTimestamp()}, {merge:true}).catch(() => {});
 });
 
+/* theme picker (accent colours, saved per user) */
+const THEMES = {neon:['Neon','#ff00cc','#3333ff','#00d4ff','#00ffcc'], ocean:['Ocean','#00b4ff','#0050ff','#00ffd5','#4dd0ff'], toxic:['Toxic','#b6ff00','#00c853','#00e5ff','#76ff03'],
+  sunset:['Sunset','#ff7a00','#ff0055','#ffd000','#ff9a3c'], violet:['Violet','#b388ff','#651fff','#ea80fc','#d1a3ff'], ice:['Ice','#ffffff','#90a4ae','#cfd8dc','#eceff1']};
+function applyTheme(k){
+  const t = THEMES[k] || THEMES.neon; curTheme = THEMES[k] ? k : 'neon'; const r = document.documentElement.style;
+  r.setProperty('--grad-1', t[1]); r.setProperty('--grad-2', t[2]); r.setProperty('--grad-3', t[3]); r.setProperty('--neon-green', t[4]);
+}
+applyTheme(localStorage.getItem('theme') || 'neon');
+function showTheme(){
+  const b = openModal('Theme', 'theme'), g = h('div', {class:'themes'}); b.append(g);
+  Object.entries(THEMES).forEach(([k, t]) => g.append(h('button', {class:'sw' + (curTheme === k ? ' on' : ''), text:t[0], style:'background:linear-gradient(135deg,' + t[1] + ',' + t[3] + ')',
+    onclick: () => { applyTheme(k); localStorage.setItem('theme', k); setDoc(doc(db,'users',me), {theme:k}, {merge:true}).catch(() => {}); showTheme(); }})));
+}
+$('themeBtn').onclick = showTheme;
+
+/* alert sound / vibration (default: off, saved on this device) */
+const notifMode = () => localStorage.getItem('notifMode') || 'none';
+addEventListener('pointerdown', () => { try { dingCtx = dingCtx || new (window.AudioContext || window.webkitAudioContext)(); dingCtx.resume(); } catch {} });
+function ding(force){
+  if (!force && Date.now() - lastDing < 1200) return; lastDing = Date.now();
+  const m = notifMode();
+  if ((m === 'sound' || m === 'both') && dingCtx) { try { const t = dingCtx.currentTime;
+    [[660, 0], [880, .13]].forEach(([f, dl]) => { const o = dingCtx.createOscillator(), g = dingCtx.createGain(); o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(dingCtx.destination);
+      g.gain.setValueAtTime(.0001, t + dl); g.gain.exponentialRampToValueAtTime(.2, t + dl + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dl + .28); o.start(t + dl); o.stop(t + dl + .32); }); } catch {} }
+  if ((m === 'vibrate' || m === 'both') && navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch {} }
+}
+function showSound(){
+  const b = openModal('Message alert', 'sound'), cur = notifMode();
+  [['none','🔕 None (off)'], ['sound','🔊 Sound'], ['vibrate','📳 Vibration'], ['both','🔊 + 📳 Both']].forEach(([v, l]) =>
+    b.append(h('button', {class:'opt' + (cur === v ? ' on' : ''), text:l, onclick: () => { localStorage.setItem('notifMode', v); showSound(); ding(true); }})));
+  b.append(h('p', {class:'hint', text:'Off by default. Plays when a new message arrives while the page is open. Vibration works on Android phones only. Saved on this device.'}));
+}
+$('soundBtn').onclick = showSound;
+
+/* message effects: /confetti hello. Admin-only effects need Admin ON (the rules enforce this too) */
+const FX_PUB = ['confetti','fire','matrix','hearts','snow'], FX_ADM = ['lightning','quake','glitch'];
+function playFx(name){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (name === 'quake' || name === 'glitch') { const a = $('app'); a.classList.remove('quake','glitch'); void a.offsetWidth; a.classList.add(name); setTimeout(() => a.classList.remove(name), 1500); return; }
+  const cv = $('fx'), ctx = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight; cancelAnimationFrame(playFx.raf);
+  const W = cv.width, H = cv.height, R = (a, b) => a + Math.random() * (b - a), t0 = performance.now();
+  let dur = 3500, draw;
+  if (name === 'confetti') {
+    const cols = ['#ff00cc','#00d4ff','#00ffcc','#ffd000','#ff4b2b','#b388ff'];
+    const P = Array.from({length:150}, () => ({x:R(0,W), y:R(-H*.6,0), vx:R(-1.5,1.5), vy:R(2,5.5), s:R(6,12), r:R(0,6), vr:R(-.2,.2), c:cols[Math.floor(R(0,cols.length))]}));
+    draw = () => P.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); ctx.restore(); });
+  } else if (name === 'fire') {
+    const P = [];
+    draw = t => { if (t < 2400) for (let i = 0; i < 8; i++) P.push({x:R(0,W), y:H+10, vx:R(-1,1), vy:R(-9,-3), l:1, s:R(10,26)});
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; p.x += p.vx + Math.sin(p.y / 30); p.y += p.vy; p.l -= .014; if (p.l <= 0) { P.splice(i, 1); continue; }
+        ctx.fillStyle = 'rgba(255,' + Math.floor(60 + p.l * 150) + ',0,' + (p.l * .55) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, p.s * p.l, 0, 7); ctx.fill(); }
+      ctx.globalCompositeOperation = 'source-over'; };
+  } else if (name === 'matrix') {
+    dur = 4500; const cw = 18, n = Math.ceil(W / cw), ch = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ', cols = Array.from({length:n}, () => ({y:R(-H,0), v:R(6,16)}));
+    draw = t => { ctx.font = '16px monospace'; const fade = t > 3600 ? 1 - (t - 3600) / 900 : 1;
+      cols.forEach((c, i) => { c.y += c.v; if (c.y > H + 300) c.y = R(-300, 0);
+        for (let k = 0; k < 14; k++) { ctx.fillStyle = k === 0 ? 'rgba(220,255,230,' + fade + ')' : 'rgba(0,255,120,' + (fade * (1 - k / 14) * .85) + ')'; ctx.fillText(ch[Math.floor(Math.random() * ch.length)], i * cw, c.y - k * 16); } }); };
+  } else if (name === 'hearts') {
+    const em = ['❤️','💖','💗','💜'], P = Array.from({length:45}, () => ({x:R(0,W), y:H+R(0,H*.5), vy:R(-4,-1.5), s:R(20,42), e:em[Math.floor(R(0,4))], ph:R(0,6)}));
+    draw = () => P.forEach(p => { p.y += p.vy; ctx.font = p.s + 'px serif'; ctx.fillText(p.e, p.x + Math.sin(p.y / 40 + p.ph) * 20, p.y); });
+  } else if (name === 'snow') {
+    const P = Array.from({length:160}, () => ({x:R(0,W), y:R(-H,0), vy:R(1,3.5), s:R(2,5), ph:R(0,6)}));
+    draw = () => { ctx.fillStyle = 'rgba(255,255,255,.9)'; P.forEach(p => { p.y += p.vy; ctx.beginPath(); ctx.arc(p.x + Math.sin(p.y / 50 + p.ph) * 15, p.y, p.s, 0, 7); ctx.fill(); }); };
+  } else if (name === 'lightning') {
+    dur = 1200; const fl = [[0,130],[230,360],[480,620]];
+    draw = t => { const f = fl.findIndex(([a, b]) => t >= a && t < b); if (f < 0) return;
+      ctx.fillStyle = 'rgba(200,225,255,' + (f === 0 ? .55 : .4) + ')'; ctx.fillRect(0, 0, W, H);
+      if (draw.f !== f) { draw.f = f; let x = R(W*.15, W*.85), y = 0; const pts = [[x, y]]; while (y < H * .85) { x += R(-50, 50); y += R(30, 70); pts.push([x, y]); } draw.b = pts; }
+      ctx.strokeStyle = '#fff'; ctx.shadowColor = '#8ec5ff'; ctx.shadowBlur = 24; ctx.lineWidth = 3; ctx.beginPath();
+      draw.b.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.shadowBlur = 0; };
+  } else return;
+  const step = now => { const t = now - t0; ctx.clearRect(0, 0, W, H); draw(t); if (t < dur) playFx.raf = requestAnimationFrame(step); else ctx.clearRect(0, 0, W, H); };
+  playFx.raf = requestAnimationFrame(step);
+}
+
+/* drafts, @mention + /effect suggestions */
+const draftKey = k => 'draft_' + me + '_' + k;
+function hideSuggest(){ $('suggest').style.display = 'none'; sugItems = []; }
+function showSuggest(items){
+  sugItems = items; sugIdx = 0; const box = $('suggest'); box.innerHTML = '';
+  items.forEach((it, i) => { const bt = h('button', {class:'sg' + (i === 0 ? ' on' : ''), text:it.label}); bt.onpointerdown = ev => { ev.preventDefault(); pickSuggest(i); }; box.append(bt); });
+  box.style.display = items.length ? 'flex' : 'none';
+}
+function pickSuggest(i){
+  const it = sugItems[i], inp = $('msgIn'); if (!it) return;
+  const pos = inp.selectionStart ?? inp.value.length;
+  inp.value = inp.value.slice(0, it.from) + it.ins + inp.value.slice(pos);
+  const c = it.from + it.ins.length; inp.setSelectionRange(c, c); inp.focus(); hideSuggest(); inp.dispatchEvent(new Event('input'));
+}
+function updateSuggest(){
+  const inp = $('msgIn'); if (inp.disabled) return hideSuggest();
+  const pos = inp.selectionStart ?? inp.value.length, before = inp.value.slice(0, pos);
+  const fm = before.match(/^\/(\w*)$/);
+  if (fm) { const q = fm[1].toLowerCase();
+    return showSuggest([...FX_PUB, ...(adm() ? FX_ADM : [])].filter(n => n.startsWith(q)).map(n => ({label:'✨ /' + n + (FX_ADM.includes(n) ? ' (admin)' : ''), from:0, ins:'/' + n + ' '}))); }
+  const mm = chat.kind === 'group' && before.match(/(?:^|\s)@(\w*)$/);
+  if (mm) { const q = mm[1].toLowerCase(), from = before.length - mm[1].length - 1;
+    return showSuggest([...new Set([...Object.keys(NAMES), ...profiles])].filter(u => u !== me && (u.startsWith(q) || nm(u).toLowerCase().startsWith(q))).slice(0, 6).map(u => ({label:nm(u) + ' @' + u, from, ins:'@' + u + ' '}))); }
+  hideSuggest();
+}
+$('msgIn').addEventListener('input', () => {
+  if (!editing && chat && canSendIn(chat.kind, chat.id)) { const v = $('msgIn').value, k = draftKey(readId()); if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); }
+  updateSuggest();
+});
+$('msgIn').addEventListener('blur', () => setTimeout(hideSuggest, 150));
+$('msgIn').onkeydown = e => {
+  if (sugItems.length) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); sugIdx = (sugIdx + (e.key === 'ArrowDown' ? 1 : sugItems.length - 1)) % sugItems.length; [...$('suggest').children].forEach((c, i) => c.classList.toggle('on', i === sugIdx)); return; }
+    if (e.key === 'Tab' || e.key === 'Enter') { e.preventDefault(); pickSuggest(sugIdx); return; }
+    if (e.key === 'Escape') { hideSuggest(); return; }
+  }
+  if (e.key === 'Enter') send();
+};
+
+/* text with clickable links + @mentions */
+function fmtText(t){
+  return String(t).split(/(https?:\/\/[^\s<>"']*[^\s<>"'.,!?)])/g).map((seg, i) => i % 2
+    ? '<a href="' + esc(seg) + '" target="_blank" rel="noopener noreferrer">' + esc(seg) + '</a>'
+    : esc(seg).replace(/@(\w+)/g, (_, n) => `<span class="mention${n.toLowerCase()===me?' me':''}">@${n}</span>`)).join('');
+}
+function dayLabel(dt){
+  const now = new Date(), y = new Date(Date.now() - 864e5);
+  if (dt.toDateString() === now.toDateString()) return 'Today'; if (dt.toDateString() === y.toDateString()) return 'Yesterday';
+  return dt.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short', ...(dt.getFullYear() !== now.getFullYear() ? {year:'numeric'} : {})});
+}
+const msgDeleted = id => { const d = lastDocs.find(x => x.id === id); return !!(d && d.data().deleted); };
+function updateJump(){
+  const box = $('msgs'), b = $('jumpBtn'), far = box.scrollHeight - box.scrollTop - box.clientHeight > 160;
+  b.style.display = far ? 'flex' : 'none'; b.textContent = newBelow ? '⬇ ' + newBelow + ' new' : '⬇';
+}
+$('msgs').addEventListener('scroll', () => { const b = $('msgs'); if (b.scrollHeight - b.scrollTop - b.clientHeight < 80) newBelow = 0; updateJump(); });
+$('jumpBtn').onclick = () => { const b = $('msgs'); b.scrollTo({top:b.scrollHeight, behavior:'smooth'}); newBelow = 0; };
+
+/* saved (starred) messages: private to each user */
+function toggleStar(d, m){
+  const ref = doc(db,'stars',me,'items',d.id);
+  if (starred.has(d.id)) deleteDoc(ref).catch(() => {});
+  else setDoc(ref, {ck:readId(), cl:chat.label, name:m.name || m.from, text:String(m.text).slice(0, 300), at:Date.now()}).catch(e => toast('Save failed: ' + e.code));
+}
+$('starsBtn').onclick = () => { openModal('Saved messages', 'stars'); renderStars(); };
+function renderStars(){
+  const b = $('mBody'); b.innerHTML = '';
+  const items = [...starred.entries()].sort((a, c) => c[1].at - a[1].at);
+  if (!items.length) return b.append(h('p', {class:'hint', text:'Nothing saved yet. Tap a message, then ☆.'}));
+  items.forEach(([id, x]) => b.append(h('div', {class:'hrow'}, h('b', {text:x.cl + ' · ' + x.name + ' · ' + new Date(x.at).toLocaleDateString()}), h('div', {text:x.text}),
+    h('div', {class:'row', style:'margin-top:6px'}, h('button', {text:'Open', onclick: () => openStar(id, x)}), h('button', {class:'btn-clear', text:'Remove', onclick: () => deleteDoc(doc(db,'stars',me,'items',id))})))));
+}
+function openStar(id, x){ closeModal(); pendingJump = id; if (x.ck === readId()) render(); else if (x.ck === 'group') openChat('group', '', 'Group chat'); else openChat('dm', x.ck, x.cl); }
+
+/* unsend: the bubble becomes "message deleted"; the original goes to an admin-only archive */
+async function unsend(d, m){
+  if (!confirm('Unsend this message?')) return;
+  const b = writeBatch(db);
+  b.set(doc(db,'unsent', d.id + '__' + me), {from:me, chat:readId(), text:String(m.text), at:serverTimestamp()});
+  b.update(d.ref, {text:'', deleted:true, history:deleteField(), fx:deleteField()});
+  try { await b.commit(); } catch (e) { toast(e.code === 'permission-denied' ? 'Unsend failed: the 15-minute time is over' : 'Unsend failed: ' + e.code); }
+}
+async function showOriginal(d, m){
+  const b = openModal('Original (unsent) message', 'orig'); b.append(h('p', {class:'hint', text:'Loading…'}));
+  try {
+    const s = await getDoc(doc(db,'unsent', d.id + '__' + m.from)); if (modalKind !== 'orig') return; b.innerHTML = '';
+    if (!s.exists()) b.append(h('p', {class:'hint', text:'No saved copy exists for this message.'}));
+    else { const x = s.data(); b.append(h('div', {class:'hrow'}, h('b', {text:nm(x.from) + ' · unsent ' + (x.at ? x.at.toDate().toLocaleString() : '')}), h('div', {text:x.text}))); logAudit('view-unsent', nm(x.from)); }
+  } catch (e) { b.innerHTML = ''; b.append(h('p', {class:'hint', text:'Could not load: ' + e.code})); }
+}
+
 /* reactions */
 const RX = [['up','👍'],['heart','❤️'],['lol','😂'],['wow','😮'],['sad','😢'],['fire','🔥']];
 function react(d, m, key){
@@ -486,24 +677,32 @@ $('unpinBtn').onclick = () => setSet({pin: deleteField()}, 'unpin', '');
 
 function render(){
   const box = $('msgs'), top = box.scrollTop, near = box.scrollHeight - top - box.clientHeight < 80, part = canSendIn(chat.kind, chat.id);
-  box.innerHTML = '';
+  const lastD = lastDocs[lastDocs.length - 1], lastId = lastD ? lastD.id : '', newMsg = !!(lastId && lastRenderedId && lastId !== lastRenderedId);
+  box.innerHTML = ''; let lastDay = '';
   lastDocs.forEach(d => {
-    const m = d.data(), mine = m.from === me, el = document.createElement('div');
+    const m = d.data(), mine = m.from === me, gone = !!m.deleted, el = document.createElement('div');
+    const dt = m.ts ? m.ts.toDate() : new Date(), day = dt.toDateString();
+    if (day !== lastDay) { lastDay = day; box.append(h('div', {class:'dsep', text:dayLabel(dt)})); }
     el.className = 'msg' + (mine ? ' mine' : '') + (openMsg === d.id ? ' open' : ''); el.dataset.id = d.id;
     const who = document.createElement('b'); who.textContent = m.name || m.from;
     who.onclick = ev => { if (chat.kind==='group' && m.from!==me) { ev.stopPropagation(); $('msgIn').value += '@'+m.from+' '; $('msgIn').focus(); } };
-    const t = document.createElement('time'); t.textContent = m.ts ? m.ts.toDate().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '…';
+    const t = document.createElement('time'); t.textContent = m.ts ? dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '…';
     el.append(who, t);
-    if (m.edited) { const e = document.createElement('small'); e.className = 'edited'; e.textContent = ' (edited)'; el.append(e); }
+    if (m.edited && !gone) { const e = document.createElement('small'); e.className = 'edited'; e.textContent = ' (edited)'; el.append(e); }
+    if (starred.has(d.id)) el.append(h('span', {class:'starmark', text:' ⭐'}));
+    if (m.fx && !gone) el.append(h('span', {class:'fxtag', text:' ✨ ' + m.fx, title:'Play again', onclick: ev => { ev.stopPropagation(); playFx(m.fx); }}));
     if (m.reply) {
       const q = document.createElement('div'); q.className = 'quote';
-      const qn = document.createElement('span'), qt = document.createElement('span'); qn.textContent = m.reply.name; qt.textContent = m.reply.text;
+      const qn = document.createElement('span'), qt = document.createElement('span'); qn.textContent = m.reply.name; qt.textContent = msgDeleted(m.reply.id) ? 'message deleted' : m.reply.text;
       q.append(qn, qt); q.onclick = ev => { ev.stopPropagation(); jumpTo(m.reply.id); }; el.append(q);
     }
     const tx = document.createElement('div'); tx.className = 'txt';
-    tx.innerHTML = esc(m.text).replace(/@(\w+)/g, (_,n) => `<span class="mention${n.toLowerCase()===me?' me':''}">@${n}</span>`);
+    if (gone) {
+      tx.classList.add('gone'); tx.textContent = '🚫 message deleted';
+      if (adm()) { tx.title = 'Click to view the original'; tx.style.cursor = 'pointer'; tx.onclick = ev => { ev.stopPropagation(); showOriginal(d, m); }; }
+    } else tx.innerHTML = fmtText(m.text);
     el.append(tx);
-    const rxs = RX.filter(([k]) => ((m.reactions || {})[k] || []).length);
+    const rxs = gone ? [] : RX.filter(([k]) => ((m.reactions || {})[k] || []).length);
     if (rxs.length) {
       const row = h('div', {class:'rxrow'});
       rxs.forEach(([k, e]) => { const l = m.reactions[k], on = l.includes(me);
@@ -515,22 +714,30 @@ function render(){
     if (mine) el.append(tickEl(m));
     const a = h('div', {class:'acts'});
     const mk = (ic, title, fn) => { const bt = h('button', {text:ic, title}); bt.onclick = ev => { ev.stopPropagation(); fn(); }; return bt; };
-    if (part) {
-      const pk = h('span', {class:'picker'}); RX.forEach(([k, e]) => pk.append(mk(e, 'React', () => react(d, m, k)))); a.append(pk);
-      a.append(mk('↩', 'Reply', () => startReply(d.id, m)));
-      if (mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS))) a.append(mk('✏', 'Edit', () => startEdit(d, m)));
-    }
-    if (adm()) {
-      a.append(mk('📌', 'Pin message', () => setSet({pin:{id:d.id, name:m.name || m.from, text:String(m.text).slice(0, 100)}}, 'pin', nm(m.from) + ': ' + String(m.text).slice(0, 60))));
-      if (m.history && m.history.length) a.append(mk('🕘', 'Edit history', () => showHistory(m)));
-    }
+    if (!gone) {
+      if (part) {
+        const pk = h('span', {class:'picker'}); RX.forEach(([k, e]) => pk.append(mk(e, 'React', () => react(d, m, k)))); a.append(pk);
+        a.append(mk('↩', 'Reply', () => startReply(d.id, m)));
+        a.append(mk(starred.has(d.id) ? '⭐' : '☆', starred.has(d.id) ? 'Remove from saved' : 'Save message', () => toggleStar(d, m)));
+        const canOwn = mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS));
+        if (canOwn) { a.append(mk('✏', 'Edit', () => startEdit(d, m))); a.append(mk('🗑', 'Unsend', () => unsend(d, m))); }
+      }
+      if (adm()) {
+        a.append(mk('📌', 'Pin message', () => setSet({pin:{id:d.id, name:m.name || m.from, text:String(m.text).slice(0, 100)}}, 'pin', nm(m.from) + ': ' + String(m.text).slice(0, 60))));
+        if (m.history && m.history.length) a.append(mk('🕘', 'Edit history', () => showHistory(m)));
+      }
+    } else if (adm()) a.append(mk('👁', 'View original', () => showOriginal(d, m)));
     if (a.childElementCount) el.append(a);
-    el.onclick = () => { openMsg = openMsg === d.id ? null : d.id; box.querySelectorAll('.msg').forEach(x => x.classList.toggle('open', x.dataset.id === openMsg)); };
+    el.onclick = ev => { if (ev.target.closest('a')) return; openMsg = openMsg === d.id ? null : d.id; box.querySelectorAll('.msg').forEach(x => x.classList.toggle('open', x.dataset.id === openMsg)); };
     if (adm()) { const x = document.createElement('button'); x.className='del'; x.textContent='✕';
-      x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); logAudit('delete-message', nm(m.from) + ': ' + String(m.text).slice(0, 60)); }; el.append(x); }
+      x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); logAudit('delete-message', nm(m.from) + ': ' + (gone ? '[unsent]' : String(m.text).slice(0, 60))); }; el.append(x); }
     box.append(el);
   });
-  if (justOpened || near) { box.scrollTop = box.scrollHeight; if (lastDocs.length) justOpened = false; } else box.scrollTop = top;
+  const mineNew = newMsg && lastD.data().from === me;
+  if (justOpened || near || mineNew) { box.scrollTop = box.scrollHeight; if (lastDocs.length) justOpened = false; newBelow = 0; }
+  else { box.scrollTop = top; if (newMsg && lastD.data().from !== me) newBelow++; }
+  lastRenderedId = lastId; updateJump();
+  if (pendingJump && box.querySelector('[data-id="' + pendingJump + '"]')) { jumpTo(pendingJump); pendingJump = ''; }
   updateComposer(); updateTyping(); touchSeen();
 }
 
@@ -538,20 +745,24 @@ function openChat(kind, id, label){
   chat = {kind, id, label}; $('chatTitle').textContent = label; drawMembers();
   const canSend = canSendIn(kind, id);
   $('callBtn').style.display = (kind === 'dm' && id.split('__').includes(me)) ? 'flex' : 'none';
-  if (editing) $('msgIn').value = '';
-  clearCompose(); openMsg = null; lastDocs = []; readsData = {}; settings = {}; justOpened = true; updateHeader(); $('msgs').innerHTML = '';
+  clearCompose(); $('msgIn').value = canSend ? (localStorage.getItem(draftKey(kind === 'group' ? 'group' : id)) || '') : ''; hideSuggest();
+  openMsg = null; lastRenderedId = ''; newBelow = 0; lastDocs = []; readsData = {}; settings = {}; justOpened = true; updateHeader(); $('msgs').innerHTML = '';
   if (unsubChat) unsubChat(); if (unsubReads) { unsubReads(); unsubReads = null; } if (unsubSet) unsubSet();
   if (unsubTyping) { unsubTyping(); unsubTyping = null; } typingData = {}; updateTyping();
   if (canSend) unsubTyping = onSnapshot(doc(db,'typing',readId()), s => { typingData = s.data() || {}; updateTyping(); }, () => {});
   applyChatState(); touchSeen();
   unsubSet = onSnapshot(doc(db,'chatset',readId()), s => { settings = s.data() || {}; applyChatState(); if (modalKind === 'tools') renderTools(); }, () => {});
   if (canSend) unsubReads = onSnapshot(doc(db,'reads',readId()), s => { readsData = s.data() || {}; render(); markRead(); }, () => {});
-  unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => { lastDocs = snap.docs; render(); markRead(); },
+  let firstSnap = true;
+  unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => {
+    if (!firstSnap) snap.docChanges().forEach(c => { if (c.type !== 'added') return; const m = c.doc.data();
+      if (m.fx && !m.deleted && !playedFx.has(c.doc.id) && (!m.ts || Date.now() - tms(m.ts) < 15000)) { playedFx.add(c.doc.id); playFx(m.fx); } });
+    firstSnap = false; lastDocs = snap.docs; render(); markRead(); },
     err => toast('Cannot open this chat: ' + err.code));
 }
 
 async function send(){
-  const text = $('msgIn').value.trim(); if (!text) return;
+  const raw = $('msgIn').value.trim(); let text = raw; if (!text) return;
   if (editing) {                                                   // edits never send a push notification
     const e = editing; $('msgIn').value = ''; clearCompose();
     if (text === e.old) return;
@@ -560,18 +771,21 @@ async function send(){
     return;
   }
   const cs = composerState(); if (!cs.ok || cs.soft) return toast(cs.msg);
-  $('msgIn').value = ''; const c = chat, r = replyTo; clearCompose();
-  const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r;
+  let fx = ''; const fm = text.match(/^\/(\w+)(?:\s+([\s\S]*))?$/);
+  if (fm) { const n = fm[1].toLowerCase();
+    if (FX_PUB.includes(n) || FX_ADM.includes(n)) {
+      if (FX_ADM.includes(n) && !adm()) return toast('That effect is admin-only');
+      fx = n; text = (fm[2] || '').trim() || '✨ ' + n; } }
+  $('msgIn').value = ''; localStorage.removeItem(draftKey(readId())); hideSuggest(); const c = chat, r = replyTo; clearCompose();
+  const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r; if (fx) data.fx = fx;
   try {
     const key = readId(), b = writeBatch(db);
     b.set(doc(colRef()), data);
     if ((settings.slow | 0) > 0) b.set(doc(db,'lastmsg', key + '__' + me), {t:serverTimestamp()});   // proves slow-mode timing to the rules
     await b.commit(); pingWorker(c, text);
-  } catch (e) { if (!$('msgIn').value) $('msgIn').value = text; toast(e.code === 'permission-denied' ? 'Blocked: chat locked, you are muted, or slow mode is on' : 'Send failed: ' + e.code); }
+  } catch (e) { if (!$('msgIn').value) $('msgIn').value = raw; toast(e.code === 'permission-denied' ? 'Blocked: chat locked, you are muted, slow mode is on, or the effect is not allowed' : 'Send failed: ' + e.code); }
 }
 $('sendBtn').onclick = send;
-$('msgIn').onkeydown = e => { if (e.key === 'Enter') send(); };
-
 /* ---------- admin ---------- */
 function adm(){ return isAdmin && adminOn; }
 function applyAdminUI(fromToggle){
@@ -671,7 +885,7 @@ async function deleteUserMsgs(u){
 async function exportChat(){
   try {
     const s = await getDocs(query(colRef(), orderBy('ts','asc')));
-    const lines = s.docs.map(d => { const m = d.data(); return '[' + (m.ts ? m.ts.toDate().toLocaleString() : '?') + '] ' + (m.name || m.from) + (m.edited ? ' (edited)' : '') + ': ' + m.text; });
+    const lines = s.docs.map(d => { const m = d.data(); return '[' + (m.ts ? m.ts.toDate().toLocaleString() : '?') + '] ' + (m.name || m.from) + (m.edited ? ' (edited)' : '') + ': ' + (m.deleted ? '[message deleted]' : m.text); });
     const a = h('a', {href:URL.createObjectURL(new Blob([lines.join('\n')], {type:'text/plain'})), download:'chat-' + chat.label.replace(/[^\w]+/g, '_') + '.txt'});
     document.body.append(a); a.click(); a.remove(); logAudit('export', lines.length + ' messages'); toast('Exported ' + lines.length + ' messages');
   } catch (e) { toast('Export failed: ' + e.code); }
