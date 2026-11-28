@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>NEON CHAT</title>
 <style>
 :root{--grad-1:#ff00cc;--grad-2:#3333ff;--grad-3:#00d4ff;--panel-bg:rgba(10,10,25,.9);--neon-border:rgba(255,255,255,.1);--neon-green:#00ffcc}
 *{box-sizing:border-box}
-body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;color:#fff;
+body{margin:0;font-family:'Segoe UI',Roboto,sans-serif;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;color:#fff;
 background:linear-gradient(-45deg,#050505,#1a1a2e,#16213e,#0f3460);background-size:400% 400%;animation:bg 15s ease infinite}
 @keyframes bg{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 button{position:relative;background:rgba(255,255,255,.05);color:#fff;border:2px solid var(--neon-green);padding:10px 20px;border-radius:12px;font-weight:800;cursor:pointer;overflow:hidden;transition:all .3s;text-transform:uppercase;font-size:11px;letter-spacing:1px;display:flex;align-items:center;justify-content:center}
@@ -30,7 +30,7 @@ input:focus{border-color:var(--neon-green)}
 header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);border-bottom:2px solid var(--neon-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .tool-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 #whoami{color:#888;font-size:12px;font-weight:800}
-.container{display:grid;grid-template-columns:270px 1fr;flex:1;gap:20px;padding:20px;min-height:0}
+.container{display:grid;grid-template-columns:minmax(220px,300px) 1fr;flex:1;gap:20px;padding:20px;min-height:0;width:100%;max-width:1500px;margin:0 auto}
 .panel{background:var(--panel-bg);border-radius:24px;border:1px solid var(--neon-border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .panel-header{padding:12px 22px;background:rgba(255,255,255,.03);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--neon-border);font-size:11px;font-weight:800;color:#888;text-transform:uppercase;gap:8px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--grad-1);box-shadow:0 0 8px var(--grad-1)}
@@ -71,7 +71,50 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
 #callName{font-size:1.8rem;font-weight:900}#callStatus{color:#888;font-weight:700;letter-spacing:1px;min-height:18px}
 .call-btns{display:flex;gap:14px;margin-top:22px}
 @media(prefers-reduced-motion:reduce){#callAvatar{animation:none}}
-@media(max-width:760px){.container{grid-template-columns:1fr;grid-template-rows:150px 1fr;padding:12px;gap:12px}.msg{max-width:90%}}
+select{background:rgba(255,255,255,.05);color:var(--neon-green);border:2px solid var(--neon-border);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;outline:none;max-width:100%}
+select:focus{border-color:var(--neon-green)}option{background:#0a0a19;color:#fff}
+#typingBar{display:none;padding:2px 18px 6px;font-size:12px;color:var(--grad-3);font-weight:700;font-style:italic}
+.badge{background:var(--grad-1);color:#fff;border-radius:11px;padding:1px 8px;font-size:11px;font-weight:900;margin-left:8px;box-shadow:0 0 10px rgba(255,0,204,.6)}
+#adminBar{display:none;gap:10px;padding:8px 24px;background:rgba(255,0,100,.06);border-bottom:1px solid var(--neon-border);flex-wrap:wrap}
+#annBar{display:none;padding:9px 18px;background:rgba(255,200,0,.1);border-bottom:1px solid rgba(255,200,0,.35);color:#ffd54a;font-size:13px;font-weight:700;word-break:break-word}
+#pinBar{display:none;align-items:center;gap:10px;padding:8px 18px;background:rgba(0,212,255,.07);border-bottom:1px solid var(--neon-border);font-size:12px;color:#cfefff}
+#pinTxt{flex:1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#unpinBtn{padding:1px 8px;font-size:11px;border-width:1px;border-color:#ff4b2b;color:#ff4b2b}
+.acts{flex-wrap:wrap;align-items:center}.picker{display:flex;gap:2px;margin-right:6px}
+.acts .picker button{border:none;background:none;padding:1px 4px;font-size:17px}
+.rxrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.rx{padding:1px 9px;font-size:12px;border-width:1px;border-radius:14px;text-transform:none;letter-spacing:0;border-color:var(--neon-border)}
+.rx.me{border-color:var(--grad-1);background:rgba(255,0,204,.16)}.rx:hover{transform:none;box-shadow:none}
+#modal{display:none;position:fixed;inset:0;z-index:180;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px}
+#modal .card{width:min(580px,100%);max-height:90vh;max-height:90dvh;overflow:auto;background:#0b0b1c;border:1px solid var(--neon-border);border-radius:22px;padding:18px 20px;box-shadow:0 0 60px rgba(255,0,204,.18)}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:16px;font-weight:900}
+.mh button{padding:2px 10px;font-size:12px}
+.sec{padding:12px 0;border-bottom:1px solid var(--neon-border)}.sec:last-child{border:none}
+.sec h4{margin:0 0 8px;color:var(--grad-3);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row input{flex:1;min-width:140px}
+.hint{color:#888;font-size:12px;margin:6px 0 0}
+.hrow,.arow{padding:8px 0;border-bottom:1px solid var(--neon-border);font-size:13px;color:#ddd;word-break:break-word}
+.hrow b,.arow b{display:block;font-size:11px;color:var(--grad-3)}
+.tbl-wrap{overflow-x:auto}.tbl{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+.tbl th,.tbl td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--neon-border)}.tbl th{color:#888;font-size:11px;text-transform:uppercase}
+@media(min-width:1200px){.container{padding:24px;gap:24px}.msg{max-width:62%}#msgs{padding:24px 28px}}
+@media(max-width:1000px) and (min-width:761px){.container{grid-template-columns:210px 1fr;gap:14px;padding:14px}}
+@media(max-width:760px){
+  header{padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top))}
+  .logo{font-size:1.1rem}
+  .tool-bar{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.tool-bar>*{flex:0 0 auto}
+  #adminBar{padding:6px 12px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#adminBar>*{flex:0 0 auto}
+  .container{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);padding:8px;gap:8px}
+  .container>.panel:first-child .panel-header{display:none}
+  #members{flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:8px;gap:8px}
+  .mem{flex:0 0 auto;padding:8px 12px;white-space:nowrap;font-size:13px}.mem small{display:none}.mem:hover{transform:none}
+  .panel{border-radius:18px}.msg{max-width:90%}#msgs{padding:12px}
+  #sendbar{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  input,select{font-size:16px}
+  .acts button{min-height:34px;min-width:34px}.acts .picker button{font-size:20px}
+  #modal{align-items:flex-end;padding:0}#modal .card{border-radius:22px 22px 0 0;max-height:88vh;max-height:88dvh;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+  #toast{width:calc(100% - 24px);bottom:90px;text-align:center}
+}
 </style>
 </head>
 <body>
@@ -93,20 +136,27 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
       <span id="whoami"></span>
       <button id="adminToggle" class="btn-back" style="display:none"></button>
       <button id="notifBtn" class="btn-back">Enable notifications</button>
-      <button class="btn-clear admin-only" id="clearBtn" style="display:none">Clear history</button>
-      <button class="btn-clear admin-only" id="kickAllBtn" style="display:none">Log out others</button>
-      <button class="btn-back admin-only" id="monBtn" style="display:none">Monitor DM</button>
       <button class="btn-clear" id="outBtn">Log out</button>
     </div>
   </header>
+  <div id="adminBar" class="admin-only">
+    <button class="btn-clear" id="clearBtn">Clear history</button>
+    <button class="btn-clear" id="kickAllBtn">Log out others</button>
+    <button class="btn-back" id="monBtn">Monitor DM</button>
+    <button class="btn-back" id="actBtn">Activity</button>
+    <button class="btn-back" id="auditBtn">Audit log</button>
+  </div>
   <div class="container">
     <div class="panel">
       <div class="panel-header">Members <div class="dot"></div></div>
       <div id="members"></div>
     </div>
     <div class="panel">
-      <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
+      <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="toolsBtn" class="btn-back admin-only" style="display:none;padding:5px 12px">🛠 Tools</button><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
+      <div id="annBar"></div>
+      <div id="pinBar"><span id="pinTxt"></span><button id="unpinBtn">✕</button></div>
       <div id="msgs"></div>
+      <div id="typingBar"></div>
       <div id="replyBar"><span id="replyTxt"></span><button id="replyX">✕</button></div>
       <div id="sendbar">
         <input id="msgIn" placeholder="Message… use @username to notify someone" autocomplete="off">
@@ -124,12 +174,13 @@ header{padding:12px 24px;background:rgba(0,0,0,.7);backdrop-filter:blur(15px);bo
     <button id="hangBtn" class="btn-clear">Hang up</button>
   </div>
 </div>
+<div id="modal"><div class="card"><div class="mh"><span id="mTitle"></span><button id="mX" class="btn-clear">✕</button></div><div id="mBody"></div></div></div>
 <div id="toast"></div>
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {getFirestore,collection,doc,setDoc,addDoc,deleteDoc,onSnapshot,query,orderBy,limit,serverTimestamp,getDocs,writeBatch,arrayUnion,arrayRemove,where,updateDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getFirestore,collection,doc,setDoc,addDoc,deleteDoc,onSnapshot,query,orderBy,limit,serverTimestamp,getDocs,writeBatch,arrayUnion,arrayRemove,where,updateDoc,deleteField,getDoc,getCountFromServer} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {getMessaging,getToken,onMessage} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
 /* ============ EDIT THIS SECTION ============ */
@@ -171,8 +222,9 @@ const nm = u => NAMES[u] || u;
 const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let me = '', isAdmin = false, chat = {kind:'group', id:'', label:'Group chat'}, profiles = [], unsubs = [], unsubChat = null;
 const dmWatch = new Map();
-let adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
+let typingData = {}, unsubTyping = null, lastTypingWrite = 0, unread = {}, lastReadOf = {}, settings = {}, unsubSet = null, modalKind = '', adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
 const EDIT_MS = 15 * 60 * 1000;
+const unreadWatch = new Map();
 
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
 
@@ -196,7 +248,8 @@ onAuthStateChanged(auth, async user => {
   if (callRef || pc) endCall(true, false);
   unsubs.forEach(f => f()); unsubs = []; if (unsubChat) unsubChat();
   dmWatch.forEach(f => f()); dmWatch.clear();
-  if (unsubReads) { unsubReads(); unsubReads = null; } clearInterval(hbT); presence = {};
+  if (unsubReads) { unsubReads(); unsubReads = null; } if (unsubSet) { unsubSet(); unsubSet = null; } if (unsubTyping) { unsubTyping(); unsubTyping = null; }
+  unreadWatch.forEach(f => f()); unreadWatch.clear(); unread = {}; lastReadOf = {}; typingData = {}; clearInterval(hbT); presence = {};
   if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
   me = user.email.split('@')[0].toLowerCase();
   isAdmin = user.email.toLowerCase() === ADMIN_EMAIL;
@@ -215,11 +268,16 @@ onAuthStateChanged(auth, async user => {
     const d = s.data(); if (!d || isAdmin) return;
     if (d.target === 'all' || d.target === me) { toast('You were logged out by admin'); logout(); }
   }));
+  // private warning pop-up from admin
+  unsubs.push(onSnapshot(doc(db,'warn',me), s => {
+    const d = s.data(); if (!d) return; const k = 'warnSeen_' + me;
+    if (d.at > (+localStorage.getItem(k) || 0)) { localStorage.setItem(k, d.at); showWarn(d.text); }
+  }, () => {}));
   // in-app alerts: @mentions in the group chat
   let gFirst = true; const mention = new RegExp('@' + me.replace(/[^\w]/g, '\\$&') + '(?!\\w)', 'i');
   unsubs.push(onSnapshot(query(collection(db,'group'), orderBy('ts','desc'), limit(1)), s => {
     if (gFirst) { gFirst = false; return; }
-    s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me && mention.test(m.text || '')) alertUser(m.name + ' mentioned you', m.text, 'group', ''); } });
+    s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) bump('group'); if (m.from !== me && mention.test(m.text || '')) alertUser(m.name + ' mentioned you', m.text, 'group', ''); } });
   }, () => {}));
   // incoming voice calls
   unsubs.push(onSnapshot(query(collection(db,'calls'), where('to','==',me), where('status','==','ringing')),
@@ -232,20 +290,21 @@ onAuthStateChanged(auth, async user => {
 /* ---------- members ---------- */
 function drawMembers(){
   const list = [...new Set([...Object.keys(NAMES), ...profiles])].filter(u => u !== me).sort();
-  watchDMs(list);
+  watchDMs(list); watchUnread(list);
   const box = $('members'); box.innerHTML = '';
-  const add = (label, sub, active, fn, kickUser, online) => {
+  const add = (label, sub, active, fn, kickUser, online, count) => {
     const el = document.createElement('div'); el.className = 'mem' + (active ? ' active' : '');
     const l = document.createElement('span'); l.textContent = label;
     const s = document.createElement('small'); s.textContent = sub; l.append(' ', s); if (online) { const d = document.createElement('i'); d.className = 'pdot'; l.prepend(d); } el.append(l);
+    if (count) { const bg = document.createElement('span'); bg.className = 'badge'; bg.textContent = count > 99 ? '99+' : count; l.append(bg); }
     if (kickUser && adm()) { const k = document.createElement('button'); k.className='kick'; k.textContent='Kick';
       k.onclick = ev => { ev.stopPropagation(); setDoc(doc(db,'control','logout'), {target:kickUser, at:Date.now()}); toast(nm(kickUser)+' logged out'); };
       el.append(k); }
     el.onclick = fn; box.append(el);
   };
-  add('# Group chat', '', chat.kind==='group', () => openChat('group','','Group chat'));
+  add('# Group chat', '', chat.kind==='group', () => openChat('group','','Group chat'), null, false, unread.group);
   list.forEach(u => { const id = [me,u].sort().join('__');
-    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u, isOnline(u)); });
+    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u, isOnline(u), unread[id]); });
 }
 
 /* ---------- in-app alerts (free, work while the site is open) ---------- */
@@ -254,7 +313,7 @@ function watchDMs(list){
     const id = [me,u].sort().join('__'); if (dmWatch.has(id)) return; let first = true;
     dmWatch.set(id, onSnapshot(query(collection(db,'dms',id,'messages'), orderBy('ts','desc'), limit(1)), s => {
       if (first) { first = false; return; }
-      s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) alertUser(m.name + ' (private)', m.text, 'dm', id); } });
+      s.docChanges().forEach(c => { if (c.type === 'added') { const m = c.doc.data(); if (m.from !== me) bump(id); if (m.from !== me) alertUser(m.name + ' (private)', m.text, 'dm', id); } });
     }, () => {}));
   });
 }
@@ -291,7 +350,7 @@ function updateHeader(){
   if (isOnline(peer)) { s.textContent = '● online'; s.className = 'on'; }
   else if (p && p.t) s.textContent = 'last seen ' + ago(p.t);
 }
-document.addEventListener('visibilitychange', () => { if (!me || !auth.currentUser) return; if (document.hidden) beat(false); else { beat(true); markRead(); } });
+document.addEventListener('visibilitychange', () => { if (!me || !auth.currentUser) return; if (document.hidden) beat(false); else { beat(true); markRead(); touchSeen(); } });
 addEventListener('pagehide', () => beat(false));
 setInterval(() => { if (me && auth.currentUser) { updateHeader(); drawMembers(); } }, 30000);
 
@@ -336,8 +395,97 @@ function tickEl(m){
   return s;
 }
 
+/* tiny DOM helper */
+const h = (tag, a = {}, ...kids) => { const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(a)) { if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k.startsWith('on')) e[k] = v; else e.setAttribute(k, v); }
+  kids.flat().forEach(c => e.append(c)); return e; };
+
+/* unread badges: count of other people's messages newer than my last-read time */
+const seenAt = k => adm() ? (+localStorage.getItem('seen_' + me + '_' + k) || 0) : (lastReadOf[k] || 0);   // admin ON reads nothing on the server, so it uses a local marker
+const isOpenNow = k => k === readId() && !document.hidden && canSendIn(chat.kind, chat.id);
+function updateTitle(){
+  const n = Object.values(unread).reduce((a, b) => a + b, 0);
+  if (!titleT) document.title = (n ? '(' + n + ') ' : '') + 'NEON CHAT';
+  try { if (n) navigator.setAppBadge && navigator.setAppBadge(n); else navigator.clearAppBadge && navigator.clearAppBadge(); } catch {}
+}
+function bump(k){ if (isOpenNow(k)) return; unread[k] = (unread[k] || 0) + 1; drawMembers(); updateTitle(); }
+function touchSeen(){
+  if (document.hidden || !me || !canSendIn(chat.kind, chat.id)) return;
+  const k = readId(); if (adm()) localStorage.setItem('seen_' + me + '_' + k, Date.now());
+  if (unread[k]) { unread[k] = 0; drawMembers(); updateTitle(); }
+}
+async function refreshUnread(k){
+  if (isOpenNow(k)) { if (unread[k]) { unread[k] = 0; drawMembers(); updateTitle(); } return; }
+  try {
+    const col = k === 'group' ? collection(db,'group') : collection(db,'dms',k,'messages');
+    const s = await getDocs(query(col, where('ts','>', new Date(seenAt(k))), orderBy('ts','asc'), limit(100)));
+    unread[k] = s.docs.filter(d => d.data().from !== me).length;
+  } catch { return; }
+  drawMembers(); updateTitle();
+}
+function watchUnread(list){
+  ['group', ...list.map(u => [me, u].sort().join('__'))].forEach(k => {
+    if (unreadWatch.has(k)) return;
+    unreadWatch.set(k, onSnapshot(doc(db,'reads',k), s => { lastReadOf[k] = tms((s.data() || {})[me]); refreshUnread(k); }, () => {}));
+  });
+}
+
+/* typing indicator: a tiny typing/{chat} doc, one timestamp per person, written at most every 2.5 s */
+function updateTyping(){
+  const bar = $('typingBar'), now = Date.now();
+  const lastFrom = u => { for (let i = lastDocs.length - 1; i >= 0; i--) { const m = lastDocs[i].data(); if (m.from === u) return tms(m.ts); } return 0; };
+  const names = Object.entries(typingData).filter(([u, t]) => u !== me && t && t.toMillis && now - t.toMillis() < 5000 && lastFrom(u) < t.toMillis()).map(([u]) => nm(u));
+  bar.style.display = names.length ? 'block' : 'none';
+  bar.textContent = names.length ? names.join(', ') + (names.length > 1 ? ' are typing…' : ' is typing…') : '';
+}
+$('msgIn').addEventListener('input', () => {
+  if (adm() || editing || !$('msgIn').value || !canSendIn(chat.kind, chat.id) || Date.now() - lastTypingWrite < 2500) return;   // admin ON stays invisible
+  lastTypingWrite = Date.now();
+  setDoc(doc(db,'typing',readId()), {[me]: serverTimestamp()}, {merge:true}).catch(() => {});
+});
+
+/* reactions */
+const RX = [['up','👍'],['heart','❤️'],['lol','😂'],['wow','😮'],['sad','😢'],['fire','🔥']];
+function react(d, m, key){
+  const has = ((m.reactions || {})[key] || []).includes(me);
+  updateDoc(d.ref, {['reactions.' + key]: has ? arrayRemove(me) : arrayUnion(me)}).catch(e => toast('Reaction failed: ' + e.code));
+}
+
+/* composer: lock / mute / slow mode (admin ON is never blocked) */
+const PH = 'Message… use @username to notify someone';
+function composerState(){
+  if (!canSendIn(chat.kind, chat.id)) return {ok:false, msg:'Read-only (admin monitor)'};
+  if (adm()) return {ok:true};
+  if (settings.locked) return {ok:false, msg:'🔒 Chat is locked by admin'};
+  const mu = tms((settings.mutes || {})[me]);
+  if (mu > Date.now()) return {ok:false, msg:'🔇 You are muted until ' + new Date(mu).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})};
+  const n = settings.slow | 0;
+  if (n > 0) {
+    let last = 0;
+    for (let i = lastDocs.length - 1; i >= 0; i--) { const m = lastDocs[i].data(); if (m.from === me) { last = m.ts ? tms(m.ts) : Date.now(); break; } }
+    const wait = Math.ceil((last + n * 1000 - Date.now()) / 1000);
+    if (last && wait > 0) return {ok:true, soft:true, wait, msg:'Slow mode: wait ' + wait + 's'};
+  }
+  return {ok:true};
+}
+function updateComposer(){
+  const c = composerState(), inp = $('msgIn'), btn = $('sendBtn');
+  inp.disabled = !c.ok; btn.disabled = !c.ok || !!c.soft;
+  inp.placeholder = c.ok ? PH : c.msg; btn.textContent = c.soft ? c.wait + 's' : 'Send';
+}
+setInterval(() => { if (me && auth.currentUser) { updateComposer(); updateTyping(); } }, 1000);
+function applyChatState(){
+  const a = $('annBar'), p = $('pinBar');
+  if (settings.announce && settings.announce.text) { a.style.display = 'block'; a.textContent = '📢 ' + settings.announce.text; } else a.style.display = 'none';
+  if (settings.pin) { p.style.display = 'flex'; $('pinTxt').textContent = '📌 ' + settings.pin.name + ': ' + settings.pin.text; $('unpinBtn').style.display = adm() ? 'flex' : 'none'; }
+  else p.style.display = 'none';
+  updateComposer();
+}
+$('pinTxt').onclick = () => settings.pin && jumpTo(settings.pin.id);
+$('unpinBtn').onclick = () => setSet({pin: deleteField()}, 'unpin', '');
+
 function render(){
-  const box = $('msgs'), top = box.scrollTop, near = box.scrollHeight - top - box.clientHeight < 80, canSend = canSendIn(chat.kind, chat.id);
+  const box = $('msgs'), top = box.scrollTop, near = box.scrollHeight - top - box.clientHeight < 80, part = canSendIn(chat.kind, chat.id);
   box.innerHTML = '';
   lastDocs.forEach(d => {
     const m = d.data(), mine = m.from === me, el = document.createElement('div');
@@ -355,30 +503,48 @@ function render(){
     const tx = document.createElement('div'); tx.className = 'txt';
     tx.innerHTML = esc(m.text).replace(/@(\w+)/g, (_,n) => `<span class="mention${n.toLowerCase()===me?' me':''}">@${n}</span>`);
     el.append(tx);
-    if (mine) el.append(tickEl(m));
-    if (canSend) {
-      const a = document.createElement('div'); a.className = 'acts';
-      const mk = (ic, title, fn) => { const bt = document.createElement('button'); bt.textContent = ic; bt.title = title; bt.onclick = ev => { ev.stopPropagation(); fn(); }; a.append(bt); };
-      mk('↩', 'Reply', () => startReply(d.id, m));
-      if (mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS))) mk('✏', 'Edit', () => startEdit(d, m));
-      el.append(a);
+    const rxs = RX.filter(([k]) => ((m.reactions || {})[k] || []).length);
+    if (rxs.length) {
+      const row = h('div', {class:'rxrow'});
+      rxs.forEach(([k, e]) => { const l = m.reactions[k], on = l.includes(me);
+        const c = h('button', {class:'rx' + (on ? ' me' : ''), title:l.map(nm).join(', '), text:e + ' ' + l.length});
+        c.onclick = ev => { ev.stopPropagation(); if (part) react(d, m, k); else toast(l.map(nm).join(', ')); };
+        row.append(c); });
+      el.append(row);
     }
+    if (mine) el.append(tickEl(m));
+    const a = h('div', {class:'acts'});
+    const mk = (ic, title, fn) => { const bt = h('button', {text:ic, title}); bt.onclick = ev => { ev.stopPropagation(); fn(); }; return bt; };
+    if (part) {
+      const pk = h('span', {class:'picker'}); RX.forEach(([k, e]) => pk.append(mk(e, 'React', () => react(d, m, k)))); a.append(pk);
+      a.append(mk('↩', 'Reply', () => startReply(d.id, m)));
+      if (mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS))) a.append(mk('✏', 'Edit', () => startEdit(d, m)));
+    }
+    if (adm()) {
+      a.append(mk('📌', 'Pin message', () => setSet({pin:{id:d.id, name:m.name || m.from, text:String(m.text).slice(0, 100)}}, 'pin', nm(m.from) + ': ' + String(m.text).slice(0, 60))));
+      if (m.history && m.history.length) a.append(mk('🕘', 'Edit history', () => showHistory(m)));
+    }
+    if (a.childElementCount) el.append(a);
     el.onclick = () => { openMsg = openMsg === d.id ? null : d.id; box.querySelectorAll('.msg').forEach(x => x.classList.toggle('open', x.dataset.id === openMsg)); };
-    if (adm()) { const x = document.createElement('button'); x.className='del'; x.textContent='✕'; x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); }; el.append(x); }
+    if (adm()) { const x = document.createElement('button'); x.className='del'; x.textContent='✕';
+      x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); logAudit('delete-message', nm(m.from) + ': ' + String(m.text).slice(0, 60)); }; el.append(x); }
     box.append(el);
   });
   if (justOpened || near) { box.scrollTop = box.scrollHeight; if (lastDocs.length) justOpened = false; } else box.scrollTop = top;
+  updateComposer(); updateTyping(); touchSeen();
 }
 
 function openChat(kind, id, label){
   chat = {kind, id, label}; $('chatTitle').textContent = label; drawMembers();
   const canSend = canSendIn(kind, id);
-  $('msgIn').disabled = $('sendBtn').disabled = !canSend;
   $('callBtn').style.display = (kind === 'dm' && id.split('__').includes(me)) ? 'flex' : 'none';
-  $('msgIn').placeholder = canSend ? 'Message… use @username to notify someone' : 'Read-only (admin monitor)';
   if (editing) $('msgIn').value = '';
-  clearCompose(); openMsg = null; lastDocs = []; readsData = {}; justOpened = true; updateHeader(); $('msgs').innerHTML = '';
-  if (unsubChat) unsubChat(); if (unsubReads) { unsubReads(); unsubReads = null; }
+  clearCompose(); openMsg = null; lastDocs = []; readsData = {}; settings = {}; justOpened = true; updateHeader(); $('msgs').innerHTML = '';
+  if (unsubChat) unsubChat(); if (unsubReads) { unsubReads(); unsubReads = null; } if (unsubSet) unsubSet();
+  if (unsubTyping) { unsubTyping(); unsubTyping = null; } typingData = {}; updateTyping();
+  if (canSend) unsubTyping = onSnapshot(doc(db,'typing',readId()), s => { typingData = s.data() || {}; updateTyping(); }, () => {});
+  applyChatState(); touchSeen();
+  unsubSet = onSnapshot(doc(db,'chatset',readId()), s => { settings = s.data() || {}; applyChatState(); if (modalKind === 'tools') renderTools(); }, () => {});
   if (canSend) unsubReads = onSnapshot(doc(db,'reads',readId()), s => { readsData = s.data() || {}; render(); markRead(); }, () => {});
   unsubChat = onSnapshot(query(colRef(), orderBy('ts','asc'), limit(300)), snap => { lastDocs = snap.docs; render(); markRead(); },
     err => toast('Cannot open this chat: ' + err.code));
@@ -389,14 +555,19 @@ async function send(){
   if (editing) {                                                   // edits never send a push notification
     const e = editing; $('msgIn').value = ''; clearCompose();
     if (text === e.old) return;
-    try { await updateDoc(e.ref, {text, edited:true}); }
+    try { await updateDoc(e.ref, {text, edited:true, history:arrayUnion({t:e.old, at:Date.now()})}); }
     catch (err) { toast(err.code === 'permission-denied' ? 'Edit failed: the 15-minute edit time is over' : 'Edit failed: ' + err.code); }
     return;
   }
+  const cs = composerState(); if (!cs.ok || cs.soft) return toast(cs.msg);
   $('msgIn').value = ''; const c = chat, r = replyTo; clearCompose();
   const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r;
-  try { await addDoc(colRef(), data); pingWorker(c, text); }
-  catch (e) { toast('Send failed: ' + e.code); }
+  try {
+    const key = readId(), b = writeBatch(db);
+    b.set(doc(colRef()), data);
+    if ((settings.slow | 0) > 0) b.set(doc(db,'lastmsg', key + '__' + me), {t:serverTimestamp()});   // proves slow-mode timing to the rules
+    await b.commit(); pingWorker(c, text);
+  } catch (e) { if (!$('msgIn').value) $('msgIn').value = text; toast(e.code === 'permission-denied' ? 'Blocked: chat locked, you are muted, or slow mode is on' : 'Send failed: ' + e.code); }
 }
 $('sendBtn').onclick = send;
 $('msgIn').onkeydown = e => { if (e.key === 'Enter') send(); };
@@ -408,24 +579,129 @@ function applyAdminUI(fromToggle){
   document.querySelectorAll('.admin-only').forEach(b => b.style.display = adm() ? 'flex' : 'none');
   const t = $('adminToggle'); t.style.display = isAdmin ? 'flex' : 'none'; t.textContent = 'Admin: ' + (adminOn ? 'ON' : 'OFF');
   if (!fromToggle) return;
+  if (!adm()) closeModal();
   if (!adm() && chat.kind === 'dm' && !chat.id.split('__').includes(me)) return openChat('group', '', 'Group chat');   // leave monitor view
-  drawMembers(); render(); markRead();
+  drawMembers(); render(); applyChatState(); markRead(); [...unreadWatch.keys()].forEach(refreshUnread);
 }
 $('adminToggle').onclick = () => {
   adminOn = !adminOn; localStorage.setItem('adminOn', adminOn ? '1' : '0'); applyAdminUI(true);
   toast(adminOn ? 'Admin mode ON' : 'Admin mode OFF: you appear as a normal user');
 };
+const logAudit = (action, detail) => addDoc(collection(db,'audit'), {by:me, action, chat:chat.label, detail:detail || '', at:serverTimestamp()}).catch(() => {});
+async function setSet(patch, action, detail){
+  try { await setDoc(doc(db,'chatset',readId()), patch, {merge:true}); logAudit(action, detail); }
+  catch (e) { toast('Failed: ' + e.code); }
+}
 $('clearBtn').onclick = async () => {
   if (!confirm('Delete ALL messages in "' + chat.label + '"?')) return;
   const s = await getDocs(colRef()); let b = writeBatch(db), n = 0;
   for (const d of s.docs) { b.delete(d.ref); if (++n % 400 === 0) { await b.commit(); b = writeBatch(db); } }
-  await b.commit(); toast('History cleared');
+  await b.commit(); logAudit('clear-history', n + ' messages'); toast('History cleared');
 };
-$('kickAllBtn').onclick = async () => { await setDoc(doc(db,'control','logout'), {target:'all', at:Date.now()}); toast('Everyone else was logged out'); };
+$('kickAllBtn').onclick = async () => { await setDoc(doc(db,'control','logout'), {target:'all', at:Date.now()}); logAudit('logout-all', ''); toast('Everyone else was logged out'); };
 $('monBtn').onclick = () => {
   const r = prompt('Two usernames, e.g.  alice,bob'); if (!r) return;
   const p = r.split(',').map(x => x.trim().toLowerCase()).filter(Boolean); if (p.length !== 2) return toast('Enter exactly two usernames');
   openChat('dm', p.sort().join('__'), 'Monitoring · ' + nm(p[0]) + ' & ' + nm(p[1]));
+};
+
+/* modal */
+function openModal(title, kind){ $('mTitle').textContent = title; modalKind = kind || ''; $('mBody').innerHTML = ''; $('modal').style.display = 'flex'; return $('mBody'); }
+function closeModal(){ $('modal').style.display = 'none'; modalKind = ''; }
+$('mX').onclick = closeModal; $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
+function showWarn(text){ const b = openModal('⚠ Warning from admin', 'warn'); b.append(h('p', {text}), h('button', {text:'OK', onclick:closeModal})); }
+function showHistory(m){
+  const b = openModal('Edit history', 'history');
+  b.append(h('div', {class:'hrow'}, h('b', {text:'Current'}), h('div', {text:m.text})));
+  (m.history || []).slice().reverse().forEach(x => b.append(h('div', {class:'hrow'}, h('b', {text:new Date(x.at).toLocaleString()}), h('div', {text:x.t}))));
+}
+
+/* chat tools: lock, slow, announce, pin, mute, warn, delete user's messages, export (works in group AND private chats) */
+const chatUsers = () => chat.kind === 'dm' ? chat.id.split('__') : [...new Set([...Object.keys(NAMES), ...profiles])].sort();
+$('toolsBtn').onclick = () => { openModal('Tools · ' + chat.label, 'tools'); renderTools(); };
+function renderTools(){
+  const b = $('mBody'); b.innerHTML = '';
+  const sec = (t, ...k) => b.append(h('div', {class:'sec'}, h('h4', {text:t}), ...k));
+  const sel = arr => { const e = h('select'); arr.forEach(([v, l]) => e.append(h('option', {value:v, text:l}))); return e; };
+  const others = chatUsers().filter(u => u !== me), all = chatUsers();
+  const opts = list => list.map(u => [u, nm(u)]);
+
+  sec('Lock', h('button', {class: settings.locked ? 'btn-clear' : 'btn-back', text: settings.locked ? '🔓 Unlock chat' : '🔒 Lock chat (read-only for everyone else)',
+    onclick: () => setSet({locked: !settings.locked}, settings.locked ? 'unlock' : 'lock', '')}));
+
+  const slow = sel([[0,'Off'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds'],[60,'1 minute'],[300,'5 minutes']]);
+  slow.value = String(settings.slow | 0);
+  slow.onchange = () => setSet({slow: +slow.value}, 'slow-mode', slow.value + 's');
+  sec('Slow mode (time between messages per person)', slow);
+
+  const ann = h('input', {placeholder:'Announcement text…', maxlength:'300'});
+  const annRow = h('div', {class:'row'}, ann, h('button', {text:'Post', onclick: () => { const t = ann.value.trim(); if (t) setSet({announce:{text:t, by:me, at:Date.now()}}, 'announce', t); }}));
+  if (settings.announce) annRow.append(h('button', {class:'btn-clear', text:'Remove', onclick: () => setSet({announce: deleteField()}, 'announce-remove', '')}));
+  sec('Announcement banner', annRow, h('p', {class:'hint', text: settings.announce ? 'Showing: ' + settings.announce.text : 'Shows at the top of this chat for everyone.'}));
+
+  sec('Pinned message', h('p', {class:'hint', text: settings.pin ? '📌 ' + settings.pin.name + ': ' + settings.pin.text : 'Nothing pinned. Tap a message, then 📌.'}),
+    settings.pin ? h('button', {class:'btn-clear', text:'Unpin', onclick: () => setSet({pin: deleteField()}, 'unpin', '')}) : '');
+
+  if (others.length) {
+    const mu = sel(opts(others)), du = sel([[10,'10 minutes'],[60,'1 hour'],[1440,'24 hours']]);
+    const active = Object.entries(settings.mutes || {}).filter(([, t]) => tms(t) > Date.now());
+    sec('Mute user', h('div', {class:'row'}, mu, du, h('button', {text:'Mute', onclick: () => setSet({mutes:{[mu.value]: new Date(Date.now() + du.value * 60000)}}, 'mute', nm(mu.value) + ' ' + du.options[du.selectedIndex].text)})),
+      ...active.map(([u, t]) => h('div', {class:'row', style:'margin-top:8px'}, h('span', {text:'🔇 ' + nm(u) + ' until ' + new Date(tms(t)).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}),
+        h('button', {text:'Unmute', onclick: () => setSet({mutes:{[u]: deleteField()}}, 'unmute', nm(u))}))));
+
+    const wu = sel(opts(others)), wt = h('input', {placeholder:'Private warning…', maxlength:'200'});
+    sec('Warn user (private pop-up only they see)', h('div', {class:'row'}, wu, wt, h('button', {text:'Send', onclick: async () => {
+      const t = wt.value.trim(); if (!t) return;
+      try { await setDoc(doc(db,'warn',wu.value), {text:t, at:Date.now(), by:me}); logAudit('warn', nm(wu.value) + ': ' + t); wt.value = ''; toast('Warning sent'); } catch (e) { toast('Failed: ' + e.code); } }})));
+  }
+
+  const du2 = sel(opts(all));
+  sec('Delete all messages from one user (this chat)', h('div', {class:'row'}, du2, h('button', {class:'btn-clear', text:'Delete', onclick: () => deleteUserMsgs(du2.value)})));
+  sec('Export', h('button', {text:'⬇ Download this chat (.txt)', onclick: exportChat}));
+}
+async function deleteUserMsgs(u){
+  if (!confirm('Delete ALL messages from ' + nm(u) + ' in "' + chat.label + '"?')) return;
+  try {
+    const s = await getDocs(query(colRef(), where('from','==',u))); if (!s.size) return toast('No messages from ' + nm(u));
+    let b = writeBatch(db), n = 0;
+    for (const d of s.docs) { b.delete(d.ref); if (++n % 400 === 0) { await b.commit(); b = writeBatch(db); } }
+    await b.commit(); logAudit('delete-user-messages', nm(u) + ' (' + n + ')'); toast(n + ' messages deleted');
+  } catch (e) { toast('Failed: ' + e.code); }
+}
+async function exportChat(){
+  try {
+    const s = await getDocs(query(colRef(), orderBy('ts','asc')));
+    const lines = s.docs.map(d => { const m = d.data(); return '[' + (m.ts ? m.ts.toDate().toLocaleString() : '?') + '] ' + (m.name || m.from) + (m.edited ? ' (edited)' : '') + ': ' + m.text; });
+    const a = h('a', {href:URL.createObjectURL(new Blob([lines.join('\n')], {type:'text/plain'})), download:'chat-' + chat.label.replace(/[^\w]+/g, '_') + '.txt'});
+    document.body.append(a); a.click(); a.remove(); logAudit('export', lines.length + ' messages'); toast('Exported ' + lines.length + ' messages');
+  } catch (e) { toast('Export failed: ' + e.code); }
+}
+
+/* activity panel + audit log */
+$('actBtn').onclick = async () => {
+  const b = openModal('Activity', 'activity'); b.append(h('p', {class:'hint', text:'Loading…'}));
+  const users = [...new Set([...Object.keys(NAMES), ...profiles])].sort();
+  const rows = await Promise.all(users.map(async u => {
+    let notif = '?', cnt = '?';
+    try { const t = await getDoc(doc(db,'tokens',u)); notif = (t.exists() && (t.data().tokens || []).length) ? '✅' : '❌'; } catch {}
+    try { cnt = (await getCountFromServer(query(collection(db,'group'), where('from','==',u)))).data().count; } catch {}
+    return {u, notif, cnt};
+  }));
+  if (modalKind !== 'activity') return;
+  b.innerHTML = '';
+  const tr = (cells, th) => h('tr', {}, ...cells.map(c => h(th ? 'th' : 'td', {text:String(c)})));
+  b.append(h('div', {class:'tbl-wrap'}, h('table', {class:'tbl'}, tr(['User','Status','Notifications','Group msgs'], true),
+    ...rows.map(r => { const p = presence[r.u]; return tr([nm(r.u), isOnline(r.u) ? '🟢 online' : (p && p.t ? 'last seen ' + ago(p.t) : 'never'), r.notif, r.cnt]); }))));
+};
+$('auditBtn').onclick = async () => {
+  const b = openModal('Audit log', 'audit'); b.append(h('p', {class:'hint', text:'Loading…'}));
+  try {
+    const s = await getDocs(query(collection(db,'audit'), orderBy('at','desc'), limit(100)));
+    if (modalKind !== 'audit') return; b.innerHTML = '';
+    if (!s.size) b.append(h('p', {class:'hint', text:'Nothing logged yet.'}));
+    s.docs.forEach(d => { const x = d.data();
+      b.append(h('div', {class:'arow'}, h('b', {text:(x.at ? x.at.toDate().toLocaleString() : '…') + ' · ' + nm(x.by) + ' · ' + x.action}), h('span', {text:(x.chat || '') + (x.detail ? ' — ' + x.detail : '')}))); });
+  } catch (e) { b.innerHTML = ''; b.append(h('p', {class:'hint', text:'Could not load: ' + e.code})); }
 };
 
 /* ---------- voice calls (WebRTC, signaling through Firestore) ---------- */
