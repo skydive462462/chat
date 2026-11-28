@@ -32,7 +32,7 @@ header{padding:12px 24px;background:var(--head);backdrop-filter:blur(15px);borde
 .tool-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 #whoami{color:var(--muted);font-size:12px;font-weight:800}
 .container{display:grid;grid-template-columns:minmax(220px,300px) 1fr;flex:1;gap:20px;padding:20px;min-height:0;width:100%;max-width:1500px;margin:0 auto}
-.panel{background:var(--panel-bg);border-radius:24px;border:1px solid var(--neon-border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.panel{background:var(--panel-bg);border-radius:calc(var(--rad,16px)*1.5);border:1px solid var(--neon-border);display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .panel-header{padding:12px 22px;background:rgba(var(--ov),.03);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--neon-border);font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;gap:8px}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--grad-1);box-shadow:0 0 8px var(--grad-1)}
 #members{overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
@@ -42,12 +42,12 @@ header{padding:12px 24px;background:var(--head);backdrop-filter:blur(15px);borde
 .mem small{color:var(--muted);font-weight:600}
 .kick{padding:4px 8px;font-size:10px;border-color:#ff4b2b;color:#ff4b2b}
 #msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px}
-.msg{max-width:75%;padding:10px 14px;border-radius:16px;background:rgba(var(--ov),.06);border:1px solid var(--neon-border);align-self:flex-start;word-wrap:break-word;position:relative}
+.msg{max-width:75%;padding:10px 14px;border-radius:var(--rad,16px);background:rgba(var(--ov),.06);border:1px solid var(--neon-border);align-self:flex-start;word-wrap:break-word;position:relative}
 .msg.mine{align-self:flex-end;background:rgba(var(--ng-rgb),.08);border-color:rgba(var(--ng-rgb),.35)}
 .msg b{font-size:12px;color:var(--grad-3);cursor:pointer;display:inline-block;margin-right:8px}
 .msg.mine b{color:var(--neon-green);cursor:default}
 .msg time{font-size:10px;color:var(--muted)}
-.msg .txt{margin-top:3px;font-size:15px;line-height:1.45;white-space:pre-wrap}
+.msg .txt{margin-top:3px;font-size:calc(15px*var(--fs,1));line-height:1.45;white-space:pre-wrap}
 .mention{color:var(--grad-1);font-weight:800}.mention.me{background:rgba(var(--g1-rgb),.2);border-radius:6px;padding:0 4px}
 .del{position:absolute;top:6px;right:6px;padding:0 7px;font-size:11px;border-width:1px;border-color:#ff4b2b;color:#ff4b2b;border-radius:8px}
 #sendbar{display:flex;gap:10px;padding:14px;border-top:1px solid var(--neon-border)}
@@ -130,6 +130,74 @@ select:focus{border-color:var(--neon-green)}option{background:var(--solid);color
   #modal{align-items:flex-end;padding:0}#modal .card{border-radius:22px 22px 0 0;max-height:88vh;max-height:88dvh;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
   #toast{width:calc(100% - 24px);bottom:90px;text-align:center}
 }
+/* ===== v2: customiser hooks, avatars, VIP gold, settings, message styles ===== */
+html.noanim body{animation:none}
+.av{--s:32px;width:var(--s);height:var(--s);flex:0 0 var(--s);display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#fff;overflow:hidden;font-size:calc(var(--s)*.5);line-height:1;vertical-align:middle;border:2px solid transparent;box-sizing:border-box;user-select:none;margin-right:7px;border-radius:50%;background:linear-gradient(135deg,var(--grad-1),var(--grad-3))}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+:root[data-shape=round] .av{border-radius:30%}
+:root[data-shape=hex] .av{border-radius:0;clip-path:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%)}
+:root[data-frame=ring] .av{border-color:var(--neon-green)}
+:root[data-frame=rainbow] .av{animation:frameHue 3s linear infinite}
+:root[data-frame=pulse] .av{border-color:var(--grad-1);animation:framePulse 1.8s ease-in-out infinite}
+@keyframes frameHue{0%,100%{border-color:#ff0055}20%{border-color:#ffaa00}40%{border-color:#44ff66}60%{border-color:#22ccff}80%{border-color:#aa44ff}}
+@keyframes framePulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--g1-rgb),.55)}50%{box-shadow:0 0 0 5px rgba(var(--g1-rgb),0)}}
+.av.vip{border-color:#ffd700!important;animation:none!important;box-shadow:0 0 8px rgba(255,215,0,.65)}
+.mem .av{margin-right:8px}
+@keyframes shine{to{background-position:200% center}}
+@keyframes hueSpin{to{filter:hue-rotate(360deg)}}
+.vipname{display:inline-block;background:linear-gradient(90deg,#b8860b,#ffd700,#fff3b0,#ffd700,#b8860b);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent!important;color:#ffd700!important;animation:shine 3s linear infinite;font-weight:900}
+.vipbadge{display:inline-block;margin:0 6px 0 -2px;padding:0 7px;border-radius:9px;font-size:9px;font-weight:900;letter-spacing:1px;color:#3a2a00;-webkit-text-fill-color:#3a2a00;background:linear-gradient(135deg,#ffe066,#ffb300);box-shadow:0 0 8px rgba(255,200,0,.55);vertical-align:middle;text-transform:uppercase}
+.msg.vipmsg{border-color:rgba(255,215,0,.4)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}.tabs button{padding:6px 12px;font-size:11px;border-width:1px}.tabs button.on{background:var(--neon-green);color:var(--on-acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 12px;font-size:12px;border-width:1px;text-transform:none;letter-spacing:0}.chip.on{background:var(--neon-green);color:var(--on-acc)}.chip.lock{opacity:.5}
+.swg{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.sws{height:40px;border-radius:12px;border:2px solid var(--neon-border);padding:0;font-size:10px;color:#fff;text-shadow:0 1px 3px #000}.sws.on{border-color:var(--text);box-shadow:0 0 0 2px var(--neon-green)}
+.emg{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}.emg button{padding:4px 0;font-size:22px;border-width:1px;text-transform:none;border-radius:10px}.emg button.on{background:var(--neon-green)}
+.urow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--neon-border)}.urow .info{flex:1;min-width:0;font-size:13px}.urow .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.urow .btns button{padding:4px 10px;font-size:10px;border-width:1px}
+.tag{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.5px;padding:1px 7px;border-radius:8px;margin-left:5px;border:1px solid var(--neon-border);color:var(--sub);text-transform:uppercase;vertical-align:middle}.tag.red{border-color:#ff4b2b;color:#ff4b2b}.tag.gold{border-color:#ffd700;color:#ffd700}
+.pw{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:var(--sub);cursor:pointer}.pw input{width:auto;margin-top:3px}
+.rng{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:var(--sub)}.rng input[type=range]{padding:0;border:none;background:none;flex:1}
+input[type=color]{width:46px;height:34px;padding:2px;border-radius:8px;flex:0 0 auto}
+.cust{display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12px;color:var(--sub)}
+#fxBtn{padding:10px 14px;font-size:16px}
+.arow.vipa b{color:#ffd700}
+.big-av{display:flex;align-items:center;gap:14px;margin:6px 0 10px}
+/* message styles (premium text): public */
+.st-rgb .txt{background:linear-gradient(90deg,#ff0044,#ff9900,#ffee00,#22dd55,#22aaff,#aa44ff,#ff0044);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;animation:shine 3s linear infinite}
+.st-neon .txt{color:var(--neon-green);font-weight:800;text-shadow:0 0 4px var(--neon-green),0 0 12px var(--neon-green),0 0 26px var(--grad-1)}
+.st-flame .txt{background:linear-gradient(0deg,#ff2200,#ff8800,#ffee55);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;filter:drop-shadow(0 0 6px rgba(255,100,0,.7));animation:flick .18s infinite alternate}
+@keyframes flick{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
+.st-static .txt{font-weight:800;animation:jit 1.6s steps(1) infinite}
+@keyframes jit{0%,100%{text-shadow:2px 0 #f0f,-2px 0 #0ff;transform:none}20%{text-shadow:-3px 0 #f0f,3px 0 #0ff;transform:translateX(2px)}40%{text-shadow:none;transform:none}60%{text-shadow:3px 0 #f0f,-3px 0 #0ff;transform:translateX(-2px) skewX(-6deg)}80%{text-shadow:-2px 0 #f0f,2px 0 #0ff;transform:none}}
+.st-shout .txt{font-size:calc(22px*var(--fs,1));font-weight:900;text-transform:uppercase;letter-spacing:1px}
+.st-whisper .txt{font-size:calc(12px*var(--fs,1));font-style:italic;opacity:.65;letter-spacing:.5px}
+.st-spoiler .txt{filter:blur(7px);cursor:pointer;transition:filter .3s;user-select:none}.st-spoiler.rev .txt{filter:none;user-select:text}
+.st-bounce .txt{display:inline-block;animation:bnc 1s ease-in-out infinite;font-weight:800}
+@keyframes bnc{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.st-retro .txt{font-weight:900;color:#ffe14a;text-shadow:1px 1px 0 #ff2d95,2px 2px 0 #ff2d95,3px 3px 0 #7a1fff,4px 4px 0 #7a1fff;letter-spacing:1px}
+.st-frost .txt{font-weight:800;color:#e8faff;text-shadow:0 0 4px #9be7ff,0 0 14px #4dc3ff}
+/* VIP styles */
+.msg.st-gold{border-color:rgba(255,215,0,.6);box-shadow:0 0 16px rgba(255,215,0,.2)}
+.st-gold .txt{background:linear-gradient(90deg,#b8860b,#ffd700,#fff3b0,#ffd700,#b8860b);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;animation:shine 2.5s linear infinite}
+.msg.st-regal{border-color:#b07cff;background:linear-gradient(135deg,rgba(120,60,200,.22),rgba(255,200,60,.1))}
+.st-regal .txt{color:#f6e7ff;font-weight:700;text-shadow:0 0 8px #a56bff}.st-regal .txt::before{content:'♛ ';color:#ffd700}
+.msg.st-gem{border-color:#7fe9ff;box-shadow:0 0 16px rgba(127,233,255,.2)}
+.st-gem .txt{background:linear-gradient(90deg,#7fe9ff,#ffffff,#b8f0ff,#ffffff,#7fe9ff);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;animation:shine 2s linear infinite}
+.st-holo .txt{background:linear-gradient(90deg,#ff9ad5,#ffd59a,#fffd9a,#9affc4,#9ad5ff,#d59aff,#ff9ad5);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;animation:shine 1.6s linear infinite}
+.msg.st-crown{border-color:rgba(255,215,0,.5)}.st-crown .txt{color:#ffd700;font-weight:800;text-shadow:0 0 8px rgba(255,200,0,.6)}.st-crown .txt::before{content:'👑 '}
+.st-prism .txt{color:#ff66cc;font-weight:900;text-shadow:0 0 10px currentColor;animation:hueSpin 3s linear infinite}
+/* admin styles */
+.msg.st-banner{align-self:stretch;max-width:100%;text-align:center;background:linear-gradient(90deg,rgba(255,0,100,.16),rgba(255,200,0,.16));border:1px solid var(--ann)}
+.st-banner .txt{font-size:calc(18px*var(--fs,1));font-weight:900;color:var(--ann)}
+.msg.st-banner::before{content:'📢 ADMIN';display:block;font-size:10px;letter-spacing:3px;color:var(--ann);font-weight:900}
+.msg.st-alert{border-color:#ff2d2d;animation:alertP 1s infinite}.st-alert .txt{color:#ff6b6b;font-weight:800}
+@keyframes alertP{0%,100%{box-shadow:0 0 0 rgba(255,45,45,0)}50%{box-shadow:0 0 22px rgba(255,45,45,.65)}}
+.msg.st-terminal{background:#000;border-color:#00ff66}.st-terminal .txt{color:#00ff66;font-family:ui-monospace,Menlo,Consolas,monospace;text-shadow:0 0 6px #00ff66}.st-terminal .txt::before{content:'> '}
+.st-stamp .txt{display:inline-block;border:3px solid #ff3b3b;color:#ff3b3b;padding:2px 12px;transform:rotate(-4deg);font-weight:900;text-transform:uppercase;letter-spacing:2px;border-radius:6px}
+.msg.st-godmode{border:2px solid transparent;background:linear-gradient(var(--solid),var(--solid)) padding-box,linear-gradient(90deg,#ff0080,#00e5ff,#ffe600,#ff0080) border-box;background-size:auto,300% 100%;animation:godb 3s linear infinite}
+@keyframes godb{to{background-position:0 0,300% 0}}.st-godmode .txt{font-size:calc(19px*var(--fs,1));font-weight:900}
+@media(prefers-reduced-motion:reduce){.st-rgb .txt,.st-flame .txt,.st-static .txt,.st-bounce .txt,.st-gold .txt,.st-gem .txt,.st-holo .txt,.st-prism .txt,.msg.st-alert,.msg.st-godmode,.vipname,:root[data-frame] .av{animation:none!important}}
 </style>
 </head>
 <body>
@@ -151,18 +219,19 @@ select:focus{border-color:var(--neon-green)}option{background:var(--solid);color
       <span id="whoami"></span>
       <button id="adminToggle" class="btn-back" style="display:none"></button>
       <button id="starsBtn" class="btn-back">⭐ Saved</button>
+      <button id="setBtn" class="btn-back">⚙ Settings</button>
       <button id="soundBtn" class="btn-back">🔔 Alert</button>
       <button id="themeBtn" class="btn-back">🎨 Theme</button>
       <button id="notifBtn" class="btn-back">Enable notifications</button>
       <button class="btn-clear" id="outBtn">Log out</button>
     </div>
   </header>
-  <div id="adminBar" class="admin-only">
+  <div id="adminBar">
     <button class="btn-clear" id="clearBtn">Clear history</button>
     <button class="btn-clear" id="kickAllBtn">Log out others</button>
     <button class="btn-back" id="monBtn">Monitor DM</button>
     <button class="btn-back" id="actBtn">Activity</button>
-    <button class="btn-back" id="auditBtn">Audit log</button>
+    <button class="btn-back" id="auditBtn">Logs</button>
   </div>
   <div class="container">
     <div class="panel">
@@ -170,7 +239,7 @@ select:focus{border-color:var(--neon-green)}option{background:var(--solid);color
       <div id="members"></div>
     </div>
     <div class="panel">
-      <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="toolsBtn" class="btn-back admin-only" style="display:none;padding:5px 12px">🛠 Tools</button><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
+      <div class="panel-header"><span><span id="chatTitle">Group chat</span><small id="chatSub"></small></span><span style="display:flex;gap:10px;align-items:center"><button id="toolsBtn" class="btn-back" style="display:none;padding:5px 12px">🛠 Tools</button><button id="callBtn" style="display:none;padding:5px 12px">📞 Call</button><div class="dot" style="background:var(--grad-3);box-shadow:0 0 8px var(--grad-3)"></div></span></div>
       <div id="annBar"></div>
       <div id="pinBar"><span id="pinTxt"></span><button id="unpinBtn">✕</button></div>
       <div id="msgWrap"><div id="msgs"></div><button id="jumpBtn">⬇</button></div>
@@ -179,6 +248,7 @@ select:focus{border-color:var(--neon-green)}option{background:var(--solid);color
       <div id="suggest"></div>
       <div id="sendbar">
         <input id="msgIn" placeholder="Message… use @username to notify someone" autocomplete="off">
+        <button id="fxBtn" class="btn-back" title="Effects &amp; message styles">✨</button>
         <button id="sendBtn">Send</button>
       </div>
     </div>
@@ -230,8 +300,7 @@ const ADMIN_EMAIL = "admin@sky.com";
 const NAMES = {
   admin: "SKY",
   rainbow: "rainbow",
-  daksh: "light",
-  nekoi: "neko"
+  daksh: "light"
 };
 /* ============================================ */
 
@@ -246,6 +315,12 @@ const dmWatch = new Map();
 let starred = new Map(), newBelow = 0, lastRenderedId = '', pendingJump = '', sugItems = [], sugIdx = 0, dingCtx = null, lastDing = 0, curTheme = 'neon', typingData = {}, unsubTyping = null, lastTypingWrite = 0, unread = {}, lastReadOf = {}, settings = {}, unsubSet = null, modalKind = '', adminOn = true, lastDocs = [], readsData = {}, unsubReads = null, replyTo = null, editing = null, openMsg = null, justOpened = true, readTimer = 0, hbT = null, presence = {};
 const EDIT_MS = 15 * 60 * 1000;
 const unreadWatch = new Map(), playedFx = new Set();
+let userDocs = {}, rolesMap = {}, bansMap = {}, settingsTab = 'profile';
+const revealed = new Set();
+const isVip = u => !!(rolesMap[u] && rolesMap[u].vip);
+const hasPerm = p => !!(rolesMap[me] && rolesMap[me].vip && (rolesMap[me].perms || []).includes(p));
+// admin powers: the admin (with Admin ON) has all of them, a VIP only the ones the admin ticked
+const can = p => adm() || (!isAdmin && hasPerm(p));
 
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3500)}
 
@@ -254,7 +329,7 @@ $('loginForm').onsubmit = async e => {
   e.preventDefault(); $('err').textContent = '';
   const u = $('u').value.trim().toLowerCase();
   try { await signInWithEmailAndPassword(auth, EMAILS[u] || (u.includes('@') ? u : `${u}@${EMAIL_DOMAIN}`), $('p').value); }
-  catch { $('err').textContent = 'Wrong username or password.'; }
+  catch (e) { $('err').textContent = e && e.code === 'auth/user-disabled' ? '🚫 This account is banned.' : 'Wrong username or password.'; }
 };
 $('outBtn').onclick = logout;
 // Log out = remove THIS device's notification token from the account, then sign out
@@ -270,23 +345,42 @@ onAuthStateChanged(auth, async user => {
   unsubs.forEach(f => f()); unsubs = []; if (unsubChat) unsubChat();
   dmWatch.forEach(f => f()); dmWatch.clear();
   if (unsubReads) { unsubReads(); unsubReads = null; } if (unsubSet) { unsubSet(); unsubSet = null; } if (unsubTyping) { unsubTyping(); unsubTyping = null; }
-  unreadWatch.forEach(f => f()); unreadWatch.clear(); unread = {}; lastReadOf = {}; typingData = {}; starred = new Map(); clearInterval(hbT); presence = {};
+  unreadWatch.forEach(f => f()); unreadWatch.clear(); unread = {}; lastReadOf = {}; typingData = {}; starred = new Map(); clearInterval(hbT); presence = {}; userDocs = {}; rolesMap = {}; bansMap = {};
   if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
   me = user.email.split('@')[0].toLowerCase();
   isAdmin = user.email.toLowerCase() === ADMIN_EMAIL;
+  try { const bd = await getDoc(doc(db,'bans',me)); if (bd.exists() && !isAdmin) { $('err').textContent = '🚫 This account is banned' + (bd.data().reason ? ': ' + bd.data().reason : '.'); me = ''; signOut(auth); return; } } catch {}
   $('login').style.display = 'none'; $('app').style.display = 'flex'; $('p').value = '';
   adminOn = isAdmin && localStorage.getItem('adminOn') !== '0'; applyAdminUI();
-  await setDoc(doc(db,'users',me), {name:nm(me), email:user.email}, {merge:true});
+  await setDoc(doc(db,'users',me), {name:nm(me), email:user.email}, {merge:true}).catch(() => {});
   beat(true); hbT = setInterval(() => { if (!document.hidden) beat(true); }, 60000);
   unsubs.push(onSnapshot(collection(db,'presence'), s => {
     presence = {}; s.forEach(d => { const v = d.data(); presence[d.id] = {online:!!v.online, t: v.t && v.t.toMillis ? v.t.toMillis() : Date.now()}; });
     updateHeader(); drawMembers();
   }, () => {}));
   unsubs.push(onSnapshot(collection(db,'users'), s => {
-    profiles = s.docs.map(d => d.id); drawMembers();
-    const mine = s.docs.find(d => d.id === me), tk = mine && mine.data().theme;
-    if (tk && tk !== curTheme && THEMES[tk]) { applyTheme(tk); localStorage.setItem('theme', tk); }
+    profiles = s.docs.map(d => d.id); userDocs = {}; s.docs.forEach(d => { userDocs[d.id] = d.data(); });
+    const mine = userDocs[me]; if (mine) syncPrefs(mine);
+    drawMembers(); render();
+    if (modalKind === 'settings' && (settingsTab === 'users' || settingsTab === 'profile')) drawSettings();
   }));
+  // VIP roles (read by everybody so the gold name shows for all)
+  unsubs.push(onSnapshot(collection(db,'roles'), s => {
+    rolesMap = {}; s.docs.forEach(d => { rolesMap[d.id] = d.data(); });
+    applyAdminUI(); drawMembers(); render(); applyChatState();
+    if (!can('monitor') && chat.kind === 'dm' && !chat.id.split('__').includes(me)) openChat('group', '', 'Group chat');
+    if (modalKind === 'settings') drawSettings();
+  }, () => {}));
+  // bans: the admin sees all of them, everybody else only watches their own document
+  if (isAdmin) unsubs.push(onSnapshot(collection(db,'bans'), s => {
+    bansMap = {}; s.docs.forEach(d => { bansMap[d.id] = d.data(); }); drawMembers();
+    if (modalKind === 'settings' && settingsTab === 'users') drawSettings();
+  }, () => {}));
+  unsubs.push(onSnapshot(doc(db,'bans',me), s => {
+    if (!s.exists() || isAdmin) return;
+    const r = (s.data() || {}).reason; toast('You have been banned');
+    logout().then(() => { $('err').textContent = '🚫 This account is banned' + (r ? ': ' + r : '.'); });
+  }, () => {}));
   unsubs.push(onSnapshot(collection(db,'stars',me,'items'), s => { starred = new Map(s.docs.map(x => [x.id, x.data()])); render(); if (modalKind === 'stars') renderStars(); }, () => {}));
   let first = true;   // remote log-out: reacts only to changes made after we logged in
   unsubs.push(onSnapshot(doc(db,'control','logout'), s => {
@@ -318,19 +412,28 @@ function drawMembers(){
   const list = [...new Set([...Object.keys(NAMES), ...profiles])].filter(u => u !== me).sort();
   watchDMs(list); watchUnread(list);
   const box = $('members'); box.innerHTML = '';
-  const add = (label, sub, active, fn, kickUser, online, count) => {
+  const add = (label, sub, active, fn, kickUser, online, count, uname) => {
     const el = document.createElement('div'); el.className = 'mem' + (active ? ' active' : '');
-    const l = document.createElement('span'); l.textContent = label;
-    const s = document.createElement('small'); s.textContent = sub; l.append(' ', s); if (online) { const d = document.createElement('i'); d.className = 'pdot'; l.prepend(d); } el.append(l);
+    const l = document.createElement('span'); l.style.display = 'flex'; l.style.alignItems = 'center';
+    if (online) { const d = document.createElement('i'); d.className = 'pdot'; l.append(d); }
+    if (uname) l.append(avEl(uname, 28));
+    const vip = uname && isVip(uname);
+    l.append(h('span', {class: vip ? 'vipname' : '', text:label}));
+    if (vip) l.append(h('span', {class:'vipbadge', text:'VIP', style:'margin-left:6px;margin-right:0'}));
+    const s = document.createElement('small'); s.textContent = sub; s.style.marginLeft = '6px'; l.append(s);
     if (count) { const bg = document.createElement('span'); bg.className = 'badge'; bg.textContent = count > 99 ? '99+' : count; l.append(bg); }
+    el.append(l);
     if (kickUser && adm()) { const k = document.createElement('button'); k.className='kick'; k.textContent='Kick';
-      k.onclick = ev => { ev.stopPropagation(); setDoc(doc(db,'control','logout'), {target:kickUser, at:Date.now()}); toast(nm(kickUser)+' logged out'); };
+      k.onclick = ev => { ev.stopPropagation(); kickOne(kickUser); };
       el.append(k); }
     el.onclick = fn; box.append(el);
   };
   add('# Group chat', '', chat.kind==='group', () => openChat('group','','Group chat'), null, false, unread.group);
   list.forEach(u => { const id = [me,u].sort().join('__');
-    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u, isOnline(u), unread[id]); });
+    add(nm(u), '@'+u, chat.kind==='dm' && chat.id===id, () => openChat('dm', id, 'Private · '+nm(u)), u, isOnline(u), unread[id], u); });
+}
+function kickOne(u){
+  setDoc(doc(db,'control','logout'), {target:u, at:Date.now()}).then(() => { logAudit('kick', nm(u)); toast(nm(u) + ' logged out'); }).catch(e => toast('Failed: ' + e.code));
 }
 
 /* ---------- in-app alerts (free, work while the site is open) ---------- */
@@ -485,26 +588,348 @@ const THEMES = {
             text:'#14162a', sub:'#3b3f58', muted:'#6b7090', ov:'0,0,0', onacc:'#ffffff', ann:'#8a5a00'}
 };
 const hex2rgb = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)).join(',');
-function applyTheme(k){
-  const t = THEMES[k] || THEMES.neon; curTheme = THEMES[k] ? k : 'neon'; const r = document.documentElement.style, set = (n, v) => r.setProperty(n, v), a = t.a;
+const mixHex = (a, b, k) => { const A = hex2rgb(a).split(',').map(Number), B = hex2rgb(b).split(',').map(Number); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
+const lumOf = x => { const [r, g, b] = hex2rgb(x).split(',').map(Number); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+const LT = {text:'#14162a', sub:'#3b3f58', muted:'#6b7090', ov:'0,0,0', onacc:'#ffffff', ann:'#8a5a00'};
+function mk(n, a, bg, o = {}){
+  const light = !!o.light, c0 = bg[0];
+  return {n, a, bg, vip:!!o.vip,
+    panel:'rgba(' + hex2rgb(light ? mixHex(c0, '#ffffff', .55) : mixHex(c0, '#000000', .45)) + ',' + (light ? .88 : .9) + ')',
+    solid: light ? '#ffffff' : mixHex(c0, '#000000', .35),
+    head:'rgba(' + hex2rgb(light ? '#ffffff' : mixHex(c0, '#000000', .6)) + ',' + (light ? .75 : .7) + ')',
+    login:'rgba(' + hex2rgb(c0) + ',.88)', ...(light ? LT : D)};
+}
+// more page themes (the 9 above are untouched). 👑 = VIP-only
+Object.assign(THEMES, {
+  cyber:    mk('Cyberpunk',   ['#fcee0a','#ff2a6d','#05d9e8','#fcee0a'], ['#05010f','#0d0221','#1a0a3a','#261447']),
+  midnight: mk('Midnight',    ['#6c8cff','#3d4fff','#8fd3ff','#7ea6ff'], ['#02030a','#070b1f','#0b1230','#101a45']),
+  forest:   mk('Forest',      ['#7bff9a','#00a152','#d4ff6a','#69f0ae'], ['#020805','#06170d','#0b2616','#0f3a21']),
+  lava:     mk('Lava',        ['#ff5722','#d50000','#ffab00','#ff7043'], ['#0d0402','#2a0a05','#45120a','#661a0c']),
+  aurora:   mk('Aurora',      ['#00ffa3','#7a5cff','#00d1ff','#5dffc5'], ['#020a10','#06202a','#0a3040','#14204f']),
+  candy:    mk('Candy',       ['#ff77d1','#8a7bff','#7bf3ff','#ffb3ec'], ['#150818','#2a0f33','#3a1450','#4b1a66']),
+  vapor:    mk('Vaporwave',   ['#ff71ce','#01cdfe','#b967ff','#05ffa1'], ['#0d0221','#240046','#3c096c','#5a189a']),
+  dracula:  mk('Dracula',     ['#bd93f9','#ff79c6','#8be9fd','#50fa7b'], ['#14151d','#1e1f2b','#282a36','#343746']),
+  nord:     mk('Nord',        ['#88c0d0','#5e81ac','#8fbcbb','#a3be8c'], ['#171b22','#222831','#2e3440','#3b4252']),
+  coffee:   mk('Coffee',      ['#e0a96d','#a1662f','#f5d0a9','#d9a066'], ['#0e0805','#241610','#38241a','#4e3223']),
+  steel:    mk('Steel',       ['#9fb4c7','#5c7a99','#cfe3f5','#b7cbe0'], ['#06080a','#10161c','#1a232c','#263340']),
+  royal:    mk('Royal Gold',  ['#ffd700','#b8860b','#fff3b0','#ffcc33'], ['#0a0700','#1c1400','#2e2100','#4a3500'], {vip:true}),
+  obsidian: mk('Obsidian Prism', ['#ff66cc','#66ffe0','#ffe066','#c9a7ff'], ['#000000','#08060f','#0f0a1c','#170f2b'], {vip:true}),
+  emerald:  mk('Emerald Crown',  ['#ffd700','#00c853','#b9f6ca','#69f0ae'], ['#00080a','#00201a','#003d2e','#005a40'], {vip:true}),
+  sakura:   mk('Sakura (light)',   ['#e91e8c','#9c27b0','#ff7aa8','#d81b60'], ['#fff5f8','#ffe8f0','#ffdbe8','#ffd0e0'], {light:true}),
+  mint:     mk('Mint (light)',     ['#00a67e','#2979ff','#00b8d4','#00897b'], ['#f1fff9','#e2fbf0','#d3f6e8','#c4f1e0'], {light:true}),
+  sepia:    mk('Sepia (light)',    ['#a0522d','#8d6e63','#c77d3a','#8d5524'], ['#fbf3e4','#f4e8d0','#ecdcbc','#e4d0a8'], {light:true}),
+  lavender: mk('Lavender (light)', ['#7e57c2','#ec407a','#5c6bc0','#6a4cc4'], ['#f7f3ff','#efe8ff','#e6dcff','#dccfff'], {light:true}),
+  skylight: mk('Sky (light)',      ['#0277bd','#5e35b1','#00acc1','#0288d1'], ['#f1f9ff','#e3f2fd','#d4ebfc','#c6e3fa'], {light:true})
+});
+// icon theme, part 1: accent palettes (colour of buttons, glows and icons). '' = follow the page theme
+const ACCENTS = {
+  neon:   {n:'Neon',     a:['#ff00cc','#3333ff','#00d4ff','#00ffcc']},
+  sunrise:{n:'Sunrise',  a:['#ff7a00','#ff0055','#ffd000','#ff9a3c']},
+  ocean:  {n:'Ocean',    a:['#00b4ff','#0050ff','#00ffd5','#4dd0ff']},
+  toxic:  {n:'Toxic',    a:['#b6ff00','#00c853','#00e5ff','#76ff03']},
+  violet: {n:'Violet',   a:['#b388ff','#651fff','#ea80fc','#d1a3ff']},
+  rose:   {n:'Rose',     a:['#ff3d71','#c2185b','#ff9ebb','#ff6f91']},
+  cherry: {n:'Cherry',   a:['#ff1744','#b71c1c','#ff8a80','#ff5252']},
+  mintx:  {n:'Mint',     a:['#1de9b6','#00bfa5','#a7ffeb','#64ffda']},
+  yellow: {n:'Cyber yellow', a:['#fcee0a','#ff2a6d','#05d9e8','#fcee0a']},
+  ice:    {n:'Ice',      a:['#80d8ff','#40c4ff','#e1f5fe','#b3e5fc']},
+  grape:  {n:'Grape',    a:['#ce93d8','#8e24aa','#f3e5f5','#ba68c8']},
+  lime:   {n:'Lime',     a:['#c6ff00','#76ff03','#eeff41','#aeea00']},
+  mono:   {n:'Mono',     a:['#ffffff','#9e9e9e','#e0e0e0','#f5f5f5']},
+  gold:   {n:'Gold 👑',  a:['#ffd700','#b8860b','#fff3b0','#ffcc33'], vip:true}
+};
+// icon theme, part 2: action-icon packs, avatar shape, avatar frame
+const PACKS = {
+  classic:{n:'Classic', reply:'↩', star:'☆', starOn:'⭐', edit:'✏', unsend:'🗑', pin:'📌', hist:'🕘', view:'👁'},
+  minimal:{n:'Minimal', reply:'↩', star:'☆', starOn:'★', edit:'✎', unsend:'⌫', pin:'⚑', hist:'◷', view:'◉'},
+  fun:    {n:'Fun',     reply:'💬', star:'🤍', starOn:'💛', edit:'🖊️', unsend:'💥', pin:'📍', hist:'⏳', view:'🔍'},
+  neon:   {n:'Geometric', reply:'◀', star:'△', starOn:'▲', edit:'◆', unsend:'✖', pin:'●', hist:'◔', view:'◎'}
+};
+const AVSHAPES = [['circle','⚪ Circle'], ['round','▢ Rounded'], ['hex','⬡ Hexagon']];
+const AVFRAMES = [['none','No frame'], ['ring','Accent ring'], ['rainbow','Rainbow'], ['pulse','Pulse']];
+let prefs = {theme:'neon', accent:'', pack:'classic', shape:'circle', frame:'none', custom:{}};
+const icon = k => (PACKS[prefs.pack] || PACKS.classic)[k];
+const okHex = x => /^#[0-9a-f]{6}$/i.test(x || '');
+function loadPrefs(){
+  try { const p = JSON.parse(localStorage.getItem('prefs') || 'null'); if (p) prefs = {...prefs, ...p}; else if (localStorage.getItem('theme')) prefs.theme = localStorage.getItem('theme'); } catch {}
+  if (!THEMES[prefs.theme]) prefs.theme = 'neon';
+}
+// final look = page theme, optionally recoloured by the accent palette, then by the customiser
+function computeTheme(){
+  let t = {...(THEMES[prefs.theme] || THEMES.neon)}; const c = prefs.custom || {};
+  if (ACCENTS[prefs.accent]) t.a = ACCENTS[prefs.accent].a;
+  if (Array.isArray(c.a) && c.a.length === 4 && c.a.every(okHex)) t.a = c.a;
+  if (okHex(c.b1) && okHex(c.b2)) {
+    const light = lumOf(mixHex(c.b1, c.b2, .5)) > .55, op = typeof c.po === 'number' ? c.po : (light ? .88 : .9);
+    t = {...t, bg:[c.b1, mixHex(c.b1, c.b2, 1/3), mixHex(c.b1, c.b2, 2/3), c.b2], panel:'rgba(' + hex2rgb(c.b1) + ',' + op + ')',
+      solid: light ? '#ffffff' : mixHex(c.b1, '#000000', .25), head:'rgba(' + hex2rgb(c.b1) + ',.75)', login:'rgba(' + hex2rgb(c.b1) + ',.9)', ...(light ? LT : D)};
+  } else if (typeof c.po === 'number') {
+    const m = /rgba\((\d+),(\d+),(\d+),/.exec(t.panel); if (m) t = {...t, panel:'rgba(' + m[1] + ',' + m[2] + ',' + m[3] + ',' + c.po + ')'};
+  }
+  return t;
+}
+function paint(){
+  const t = computeTheme(), de = document.documentElement, r = de.style, set = (n, v) => r.setProperty(n, v), a = t.a, c = prefs.custom || {};
+  curTheme = prefs.theme;
   set('--grad-1', a[0]); set('--grad-2', a[1]); set('--grad-3', a[2]); set('--neon-green', a[3]);
   set('--g1-rgb', hex2rgb(a[0])); set('--g3-rgb', hex2rgb(a[2])); set('--ng-rgb', hex2rgb(a[3]));
-  t.bg.forEach((c, i) => set('--bg' + (i + 1), c));
+  t.bg.forEach((x, i) => set('--bg' + (i + 1), x));
   set('--panel-bg', t.panel); set('--solid', t.solid); set('--head', t.head); set('--login', t.login);
-  set('--text', t.text); set('--sub', t.sub); set('--muted', t.muted); set('--ov', t.ov); set('--on-acc', t.onacc); set('--ann', t.ann);
+  set('--text', t.text); set('--sub', t.sub); set('--muted', t.muted); set('--ov', t.ov); set('--on-acc', lumOf(a[3]) > .5 ? '#000000' : '#ffffff'); set('--ann', t.ann);
+  set('--rad', (typeof c.rad === 'number' ? c.rad : 16) + 'px'); set('--fs', typeof c.fs === 'number' ? c.fs : 1);
   r.colorScheme = t.ov === '0,0,0' ? 'light' : 'dark';
+  de.classList.toggle('noanim', c.anim === false); de.dataset.shape = prefs.shape; de.dataset.frame = prefs.frame;
   let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = t.bg[1];
 }
-applyTheme(localStorage.getItem('theme') || 'neon');
-function showTheme(){
-  const b = openModal('Theme', 'theme'), g = h('div', {class:'themes'}); b.append(g);
-  Object.entries(THEMES).forEach(([k, t]) => { const light = t.ov === '0,0,0';
-    g.append(h('button', {class:'sw' + (curTheme === k ? ' on' : ''), text:t.n,
-      style:'background:linear-gradient(135deg,' + t.bg[1] + ' 0%,' + t.bg[3] + ' 50%,' + t.a[0] + ' 78%,' + t.a[2] + ' 100%);color:' + (light ? '#14162a' : '#fff') + (light ? ';text-shadow:none' : ''),
-      onclick: () => { applyTheme(k); localStorage.setItem('theme', k); setDoc(doc(db,'users',me), {theme:k}, {merge:true}).catch(() => {}); showTheme(); }})); });
-  b.append(h('p', {class:'hint', text:'Changes the whole page: background, panels, text and accent colours. Saved to your account.'}));
+function savePrefs(patch, remote = true){
+  prefs = {...prefs, ...patch};
+  try { localStorage.setItem('prefs', JSON.stringify(prefs)); localStorage.setItem('theme', prefs.theme); } catch {}
+  paint(); render();
+  if (remote && me) setDoc(doc(db,'users',me), {theme:prefs.theme, accent:prefs.accent || '', iconPack:prefs.pack, avShape:prefs.shape, avFrame:prefs.frame, custom:prefs.custom || {}},
+    {mergeFields:['theme','accent','iconPack','avShape','avFrame','custom']}).catch(() => {});
 }
-$('themeBtn').onclick = showTheme;
+function syncPrefs(d){
+  const n = {theme: THEMES[d.theme] ? d.theme : prefs.theme, accent: d.accent === undefined ? prefs.accent : d.accent, pack: PACKS[d.iconPack] ? d.iconPack : prefs.pack,
+    shape: d.avShape || prefs.shape, frame: d.avFrame || prefs.frame, custom: d.custom || prefs.custom || {}};
+  if (JSON.stringify(n) === JSON.stringify(prefs)) return;
+  prefs = n; try { localStorage.setItem('prefs', JSON.stringify(prefs)); localStorage.setItem('theme', prefs.theme); } catch {}
+  paint(); render();
+}
+loadPrefs(); paint();
+
+/* ---------- avatars / icons ---------- */
+const AV_BG = ['linear-gradient(135deg,#ff00cc,#3333ff)','linear-gradient(135deg,#00d4ff,#0050ff)','linear-gradient(135deg,#00ffcc,#00a152)','linear-gradient(135deg,#ff7a00,#ff0055)',
+  'linear-gradient(135deg,#b388ff,#651fff)','linear-gradient(135deg,#ffd700,#b8860b)','linear-gradient(135deg,#ff3d71,#c2185b)','linear-gradient(135deg,#76ff03,#00c853)',
+  'linear-gradient(135deg,#222,#555)','linear-gradient(135deg,#fcee0a,#ff2a6d)','linear-gradient(135deg,#80d8ff,#4a90e2)','linear-gradient(135deg,#ff9a9e,#f06292)'];
+const AV_EMOJI = ['😎','🤖','👽','👻','💀','🎃','🥷','🧙','🧛','🦸','🦊','🐺','🐱','🐼','🐯','🦁','🐸','🐙','🦄','🐲','🦉','🦅','🐬','🦈','🐢','🔥','⚡','💎','👑','🚀','🌙','⭐','🌈','❄️','🍀','🎮','🎧','🎸','⚽','🏀','🍕','🍩','🌸','🌵','🛸','☄️','🧿','🎯'];
+const blobCache = new Map();
+function imgUrl(d){
+  if (blobCache.has(d)) return blobCache.get(d);
+  if (!/^data:image\/(jpeg|png|webp);base64,/.test(d)) return '';
+  try { const bin = atob(d.split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u], {type:d.slice(5, d.indexOf(';'))})); blobCache.set(d, url); return url; } catch { return ''; }
+}
+function defaultBg(u){ const n = Math.abs([...u].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7)) % 360; return 'linear-gradient(135deg,hsl(' + n + ',80%,55%),hsl(' + ((n + 55) % 360) + ',80%,42%))'; }
+function avFrom(u, a, s, vip){
+  const e = h('span', {class:'av' + (vip ? ' vip' : '')}); e.style.setProperty('--s', s + 'px');
+  if (a && a.k === 'i' && typeof a.d === 'string' && imgUrl(a.d)) e.append(h('img', {src:imgUrl(a.d), alt:''}));
+  else if (a && a.k === 'e' && a.e) { e.style.background = AV_BG[(a.c | 0) % AV_BG.length]; e.textContent = a.e; }
+  else { e.style.background = a && a.k === 'n' ? AV_BG[(a.c | 0) % AV_BG.length] : defaultBg(u); e.textContent = String(nm(u) || u).charAt(0).toUpperCase(); }
+  return e;
+}
+const avEl = (u, s = 32) => avFrom(u, (userDocs[u] || {}).avatar, s, isVip(u));
+function shrink(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(url); let size = 128, q = .82;
+      for (let i = 0; i < 5; i++) { const cv = document.createElement('canvas'); cv.width = cv.height = size; const cx = cv.getContext('2d'), m = Math.min(im.width, im.height);
+        cx.drawImage(im, (im.width - m) / 2, (im.height - m) / 2, m, m, 0, 0, size, size);
+        const out = cv.toDataURL('image/jpeg', q); if (out.length < 30000) return res(out); size = Math.round(size * .8); q -= .08; }
+      rej(new Error('too big')); };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error('bad image')); }; im.src = url;
+  });
+}
+function avatarEditor(target, force){
+  const b = openModal(force ? 'Set icon · ' + nm(target) : 'Choose your icon', 'avdlg');
+  const cur = (userDocs[target] || {}).avatar; let dr = cur && cur.k ? {...cur} : {k:'n', c:0};
+  const draw = () => {
+    b.innerHTML = '';
+    b.append(h('div', {class:'big-av'}, avFrom(target, dr, 72, isVip(target)),
+      h('div', {class:'hint', text: force ? nm(target) + ' will NOT be able to change this icon until you press “Reset forced icon”.' : 'Pick a background and an emoji, or upload a photo.'})));
+    const bg = h('div', {class:'swg'});
+    AV_BG.forEach((g, i) => bg.append(h('button', {class:'sws' + ((dr.k === 'e' || dr.k === 'n') && (dr.c | 0) === i ? ' on' : ''), style:'background:' + g,
+      onclick: () => { dr = dr.k === 'e' ? {k:'e', e:dr.e, c:i} : {k:'n', c:i}; draw(); }})));
+    const em = h('div', {class:'emg'});
+    AV_EMOJI.forEach(x => em.append(h('button', {class:dr.k === 'e' && dr.e === x ? 'on' : '', text:x, onclick: () => { dr = {k:'e', e:x, c:(dr.c | 0)}; draw(); }})));
+    const fi = h('input', {type:'file', accept:'image/*', style:'display:none'});
+    fi.onchange = async () => { const f = fi.files[0]; if (!f) return; try { dr = {k:'i', d: await shrink(f)}; draw(); } catch { toast('Could not read that image'); } };
+    b.append(h('div', {class:'sec'}, h('h4', {text:'Background'}), bg), h('div', {class:'sec'}, h('h4', {text:'Emoji / logo'}), em),
+      h('div', {class:'sec'}, h('h4', {text:'Photo or initial'}), h('div', {class:'row'}, fi, h('button', {text:'📷 Upload photo', onclick: () => fi.click()}),
+        h('button', {class:'btn-back', text:'Use my initial', onclick: () => { dr = {k:'n', c:(dr.c | 0)}; draw(); }}))),
+      h('div', {class:'row', style:'margin-top:10px'}, h('button', {text:'Save', onclick: save}), h('button', {class:'btn-back', text:'Back', onclick: () => showSettings(force ? 'users' : 'profile')})));
+  };
+  const save = async () => {
+    try {
+      const data = {avatar: dr}, mf = ['avatar'];
+      if (force) { Object.assign(data, {forceAvatar:true, forceBy:me, forceAt:Date.now()}); mf.push('forceAvatar', 'forceBy', 'forceAt'); }
+      await setDoc(doc(db,'users',target), data, {mergeFields:mf});
+      if (force) logAudit('force-avatar', nm(target)); toast('Icon saved'); showSettings(force ? 'users' : 'profile');
+    } catch (e) { toast('Could not save: ' + (e.code === 'permission-denied' ? 'your icon is locked by admin' : e.code)); }
+  };
+  draw();
+}
+async function unlockAvatar(u){
+  try { await updateDoc(doc(db,'users',u), {forceAvatar:deleteField(), forceBy:deleteField(), forceAt:deleteField()}); logAudit('reset-forced-avatar', nm(u)); toast(nm(u) + ' can change their icon again'); }
+  catch (e) { toast('Failed: ' + e.code); }
+}
+
+/* ---------- Settings (Profile · Appearance · Alerts · Users[admin]) ---------- */
+// [key, label, ticked by default, note]. Ban, Kick and Clear logs are NOT here on purpose: they stay admin-only.
+const POWERS = [
+  ['lock','🔒 Lock / unlock chats', 1],
+  ['slow','🐢 Slow mode', 1],
+  ['announce','📢 Post announcements', 1],
+  ['pin','📌 Pin / unpin messages', 1],
+  ['mute','🔇 Mute users', 1],
+  ['warn','⚠ Send private warnings', 1],
+  ['delmsg','🗑 Delete single messages', 1],
+  ['delall','💣 Delete all of a user’s messages + clear chat history', 0, 'dangerous'],
+  ['export','⬇ Export chats', 1],
+  ['unsent','👁 See unsent originals + edit history', 0],
+  ['activity','📊 Activity panel', 0],
+  ['logs','📜 View the Logs panel (read-only, cannot clear)', 0],
+  ['fxadmin','⚡ Admin-only effects + message styles', 1],
+  ['monitor','🕵 Monitor other people’s private chats', 0, 'privacy-sensitive']
+];
+function showSettings(tab){
+  settingsTab = tab || settingsTab || 'profile'; if (settingsTab === 'users' && !adm()) settingsTab = 'profile';
+  openModal('Settings', 'settings'); drawSettings();
+}
+function drawSettings(){
+  if (modalKind !== 'settings') return;
+  if (settingsTab === 'users' && !adm()) settingsTab = 'profile';
+  const b = $('mBody'); b.innerHTML = '';
+  const tabs = [['profile','👤 Profile'], ['look','🎨 Appearance'], ['alerts','🔔 Alerts']]; if (adm()) tabs.push(['users','🛡 Users']);
+  b.append(h('div', {class:'tabs'}, tabs.map(([k, l]) => h('button', {class:settingsTab === k ? 'on' : '', text:l, onclick: () => { settingsTab = k; drawSettings(); }}))));
+  const body = h('div'); b.append(body);
+  if (settingsTab === 'profile') drawProfile(body); else if (settingsTab === 'look') drawLook(body); else if (settingsTab === 'alerts') renderAlerts(body); else drawUsers(body);
+}
+$('setBtn').onclick = () => showSettings('profile');
+$('themeBtn').onclick = () => showSettings('look');
+
+function drawProfile(b){
+  const d = userDocs[me] || {}, forced = !!d.forceAvatar, vip = isVip(me);
+  b.append(h('div', {class:'big-av'}, avEl(me, 72), h('div', {},
+    h('div', {style:'font-weight:900;font-size:18px', class: vip ? 'vipname' : '', text:nm(me)}), vip ? h('span', {class:'vipbadge', text:'VIP', style:'margin-left:0'}) : '', h('div', {class:'hint', text:'@' + me}))));
+  b.append(h('div', {class:'sec'}, h('h4', {text:'Your icon'}),
+    forced ? h('p', {class:'hint', text:'🔒 Your icon was set by the admin and is locked. Ask the admin to reset it if you want to change it.'})
+           : h('button', {text:'🖼 Change icon', onclick: () => avatarEditor(me, false)}),
+    h('p', {class:'hint', text:'Your username and display name are set by the admin and always stay the same.'})));
+  if (isAdmin) b.append(h('div', {class:'sec'}, h('h4', {text:'Role'}), h('p', {class:'hint', text:'You are the admin: all powers, including Ban, Kick and Clear logs.'})));
+  else if (vip) b.append(h('div', {class:'sec'}, h('h4', {text:'👑 You are VIP'}),
+    h('p', {class:'hint', text:'You have the gold name, the gold avatar ring, VIP effects, VIP message styles and VIP themes. Admin powers given to you:'}),
+    ...((rolesMap[me].perms || []).map(k => { const p = POWERS.find(x => x[0] === k); return p ? h('div', {class:'hint', text:'• ' + p[1]}) : ''; })),
+    (rolesMap[me].perms || []).length ? '' : h('div', {class:'hint', text:'(none yet)'})));
+}
+
+function renderAlerts(b){
+  const cur = notifMode();
+  [['none','🔕 None (off)'], ['sound','🔊 Sound'], ['vibrate','📳 Vibration'], ['both','🔊 + 📳 Both']].forEach(([v, l]) =>
+    b.append(h('button', {class:'opt' + (cur === v ? ' on' : ''), text:l, onclick: () => { localStorage.setItem('notifMode', v); drawSettings(); ding(true); }})));
+  b.append(h('p', {class:'hint', text:'Off by default. Plays when a new message arrives while the page is open. Vibration works on Android phones only. Saved on this device.'}));
+}
+
+function drawLook(b){
+  const sec = (t, ...k) => b.append(h('div', {class:'sec'}, h('h4', {text:t}), ...k));
+  // 1) page theme
+  const g = h('div', {class:'themes'});
+  Object.entries(THEMES).forEach(([k, t]) => { const light = t.ov === '0,0,0', lock = t.vip && !vipOK();
+    g.append(h('button', {class:'sw' + (prefs.theme === k ? ' on' : ''), text:(t.vip ? '👑 ' : '') + t.n + (lock ? ' 🔒' : ''),
+      style:'background:linear-gradient(135deg,' + t.bg[1] + ' 0%,' + t.bg[3] + ' 50%,' + t.a[0] + ' 78%,' + t.a[2] + ' 100%);color:' + (light ? '#14162a;text-shadow:none' : '#fff') + (lock ? ';opacity:.55' : ''),
+      onclick: () => { if (lock) return toast('👑 VIP-only theme'); savePrefs({theme:k}); drawSettings(); }})); });
+  sec('Page theme · background, panels, text', g, h('p', {class:'hint', text:'Changes the whole page. Saved to your account.'}));
+  // 2) icon theme
+  const ac = h('div', {class:'swg'});
+  ac.append(h('button', {class:'sws' + (!prefs.accent ? ' on' : ''), text:'Auto', style:'background:var(--solid);color:var(--text);text-shadow:none', onclick: () => { savePrefs({accent:''}); drawSettings(); }}));
+  Object.entries(ACCENTS).forEach(([k, x]) => { const lock = x.vip && !vipOK();
+    ac.append(h('button', {class:'sws' + (prefs.accent === k ? ' on' : ''), text:x.n + (lock ? ' 🔒' : ''), style:'background:linear-gradient(90deg,' + x.a[0] + ',' + x.a[1] + ',' + x.a[2] + ')' + (lock ? ';opacity:.55' : ''),
+      onclick: () => { if (lock) return toast('👑 VIP-only palette'); savePrefs({accent:k}); drawSettings(); }})); });
+  const chips = (list, key, fmt) => h('div', {class:'chips'}, list.map(([v, l]) => h('button', {class:'chip' + (prefs[key] === v ? ' on' : ''), text:fmt ? fmt(v, l) : l, onclick: () => { savePrefs({[key]:v}); drawSettings(); }})));
+  sec('Icon theme · accent colours (buttons, glows, icons)', ac);
+  sec('Icon theme · action icons', chips(Object.entries(PACKS).map(([k, x]) => [k, x.n]), 'pack', (v, l) => l + '  ' + PACKS[v].reply + PACKS[v].starOn + PACKS[v].edit + PACKS[v].unsend));
+  sec('Icon theme · avatar shape', chips(AVSHAPES, 'shape'));
+  sec('Icon theme · avatar frame', chips(AVFRAMES, 'frame'), h('p', {class:'hint', text:'VIPs always keep their gold ring.'}));
+  // 3) customiser
+  const cur = computeTheme(), c = prefs.custom || {};
+  const live = (patch, save) => { prefs.custom = {...(prefs.custom || {}), ...patch}; if (save) savePrefs({custom:prefs.custom}); else paint(); };
+  const col = (label, val, on) => { const i = h('input', {type:'color', value:val}); i.oninput = () => on(i.value, false); i.onchange = () => on(i.value, true); return h('label', {class:'cust'}, i, label); };
+  const acc = (okHex(c.a && c.a[0]) && Array.isArray(c.a) && c.a.length === 4 ? c.a : cur.a).slice();
+  const accRow = h('div', {class:'cust'}, ['Accent 1','Accent 2','Accent 3','Main accent'].map((l, i) => col(l, acc[i], (v, sv) => { acc[i] = v; live({a:acc.slice()}, sv); })));
+  const bgRow = h('div', {class:'cust', style:'margin-top:8px'}, col('Background A', okHex(c.b1) ? c.b1 : cur.bg[0], (v, sv) => live({b1:v, b2:okHex(prefs.custom.b2) ? prefs.custom.b2 : cur.bg[3]}, sv)),
+    col('Background B', okHex(c.b2) ? c.b2 : cur.bg[3], (v, sv) => live({b2:v, b1:okHex(prefs.custom.b1) ? prefs.custom.b1 : cur.bg[0]}, sv)));
+  const rng = (label, min, max, step, val, key) => { const i = h('input', {type:'range', min:String(min), max:String(max), step:String(step), value:String(val)});
+    i.oninput = () => live({[key]:+i.value}, false); i.onchange = () => live({[key]:+i.value}, true); return h('label', {class:'rng'}, h('span', {text:label, style:'min-width:120px'}), i); };
+  const pm = /rgba\(\d+,\d+,\d+,([\d.]+)\)/.exec(cur.panel), po = typeof c.po === 'number' ? c.po : (pm ? +pm[1] : .9);
+  const an = h('input', {type:'checkbox'}); an.checked = c.anim !== false; an.onchange = () => live({anim:an.checked}, true);
+  sec('Customiser · make your own look', accRow, bgRow, rng('Panel opacity', .4, 1, .05, po, 'po'), rng('Corner roundness', 4, 32, 1, typeof c.rad === 'number' ? c.rad : 16, 'rad'),
+    rng('Message text size', .85, 1.4, .05, typeof c.fs === 'number' ? c.fs : 1, 'fs'),
+    h('label', {class:'pw'}, an, h('span', {text:'Animated background'})),
+    h('div', {class:'row', style:'margin-top:8px'}, h('button', {class:'btn-clear', text:'Reset customiser', onclick: () => { savePrefs({custom:{}}); drawSettings(); }})),
+    h('p', {class:'hint', text:'Colours apply on top of the page theme and the accent palette you picked above.'}));
+}
+
+/* ----- admin: users profiles tab ----- */
+function drawUsers(b){
+  const users = [...new Set([...Object.keys(NAMES), ...profiles])].sort();
+  b.append(h('p', {class:'hint', text:'Every action here is written to the Logs panel. Only the admin account can Ban, Kick, make VIPs and force icons.'}));
+  users.forEach(u => {
+    const d = userDocs[u] || {}, vip = isVip(u), banned = !!bansMap[u], self = u === me, p = presence[u], is = u === 'admin';
+    const stat = isOnline(u) ? '🟢 online' : (p && p.t ? 'last seen ' + ago(p.t) : 'never seen');
+    const detail = h('div', {class:'hint', text:'@' + u + ' · ' + stat});
+    const top = h('div', {}, h('b', {class:vip ? 'vipname' : '', text:nm(u)}), vip ? h('span', {class:'vipbadge', text:'VIP', style:'margin-left:6px;margin-right:0'}) : '',
+      is ? h('span', {class:'tag gold', text:'admin'}) : '', banned ? h('span', {class:'tag red', text:'banned'}) : '', d.forceAvatar ? h('span', {class:'tag', text:'🔒 icon locked'}) : '');
+    const btns = h('div', {class:'btns'});
+    const bt = (t, fn, cls) => btns.append(h('button', {class:cls || 'btn-back', text:t, onclick:fn}));
+    bt('🖼 Set icon (force)', () => avatarEditor(u, true));
+    if (d.forceAvatar) bt('🔓 Reset forced icon', () => unlockAvatar(u));
+    if (!is) {
+      bt(vip ? '✏ VIP powers' : '👑 Make VIP', () => vipDialog(u));
+      if (vip) bt('✖ Remove VIP', () => removeVip(u), 'btn-clear');
+      if (!self) { bt('⏏ Kick', () => kickOne(u), 'btn-clear'); bt(banned ? '✅ Unban' : '🚫 Ban', () => banned ? unbanUser(u) : banUser(u), banned ? 'btn-back' : 'btn-clear'); }
+    }
+    bt('ℹ Details', () => userDetails(u, detail));
+    b.append(h('div', {class:'urow'}, avEl(u, 44), h('div', {class:'info'}, top, detail, btns)));
+  });
+}
+async function userDetails(u, el){
+  el.textContent = 'Loading…'; let notif = 'notifications ?', cnt = '?';
+  try { const t = await getDoc(doc(db,'tokens',u)); notif = (t.exists() && (t.data().tokens || []).length) ? 'notifications on' : 'notifications off'; } catch {}
+  try { cnt = (await getCountFromServer(query(collection(db,'group'), where('from','==',u)))).data().count; } catch {}
+  el.textContent = '@' + u + ' · ' + ((userDocs[u] || {}).email || 'no email yet') + ' · ' + notif + ' · ' + cnt + ' group messages';
+}
+function vipDialog(u){
+  const old = rolesMap[u], b = openModal((old ? 'VIP powers · ' : 'Make VIP · ') + nm(u), 'vipdlg');
+  const sel = new Set(old ? (old.perms || []) : POWERS.filter(x => x[2]).map(x => x[0])), cbs = [];
+  b.append(h('p', {class:'hint', text:'Tick the admin powers ' + nm(u) + ' will get. Ban, Kick and Clear logs are never available to VIPs. VIPs also get the gold name, a gold avatar ring, 👑 effects, 👑 message styles and 👑 themes. Their username and display name stay untouched.'}));
+  const list = h('div'); b.append(list);
+  POWERS.forEach(([k, l, , note]) => { const cb = h('input', {type:'checkbox'}); cb.checked = sel.has(k); cb.onchange = () => { if (cb.checked) sel.add(k); else sel.delete(k); }; cbs.push([k, cb]);
+    list.append(h('label', {class:'pw'}, cb, h('span', {text:l + (note ? '  (' + note + ')' : '')}))); });
+  b.append(h('p', {class:'hint', text:'Note: the server treats the two delete powers as one group, so a VIP who has either can delete messages (never the admin’s). Powers always apply, even while you have Admin OFF.'}));
+  const setAll = on => cbs.forEach(([k, cb]) => { cb.checked = on; if (on) sel.add(k); else sel.delete(k); });
+  b.append(h('div', {class:'row', style:'margin-top:10px'},
+    h('button', {class:'btn-back', text:'Select all', onclick: () => setAll(true)}), h('button', {class:'btn-back', text:'None', onclick: () => setAll(false)}),
+    h('button', {text: old ? 'Save powers' : 'Make VIP', onclick: async () => {
+      const perms = POWERS.map(x => x[0]).filter(k => sel.has(k));
+      try { await setDoc(doc(db,'roles',u), {vip:true, perms, by:me, at:Date.now()}); logAudit(old ? 'vip-update' : 'vip-grant', nm(u) + ' → ' + (perms.join(', ') || 'no powers')); toast(nm(u) + ' is VIP 👑'); showSettings('users'); }
+      catch (e) { toast('Failed: ' + e.code); } }}),
+    h('button', {class:'btn-clear', text:'Back', onclick: () => showSettings('users')})));
+}
+async function removeVip(u){
+  if (!confirm('Remove VIP from ' + nm(u) + '?')) return;
+  try { await deleteDoc(doc(db,'roles',u)); logAudit('vip-remove', nm(u)); toast(nm(u) + ' is no longer VIP'); } catch (e) { toast('Failed: ' + e.code); }
+}
+async function banUser(u){
+  if (!isAdmin || u === 'admin' || u === me) return;
+  const reason = prompt('Ban ' + nm(u) + '?\nOptional reason (they will see it):', ''); if (reason === null) return;
+  const why = reason.trim().slice(0, 120);
+  try {
+    await setDoc(doc(db,'bans',u), {by:me, at:Date.now(), reason:why});
+    await setDoc(doc(db,'control','logout'), {target:u, at:Date.now()});
+    logAudit('ban', nm(u) + (why ? ': ' + why : '')); toast(nm(u) + ' is banned'); workerAdmin('ban', u);
+  } catch (e) { toast('Ban failed: ' + e.code); }
+}
+async function unbanUser(u){
+  if (!isAdmin) return;
+  try { await deleteDoc(doc(db,'bans',u)); logAudit('unban', nm(u)); toast(nm(u) + ' is unbanned'); workerAdmin('unban', u); } catch (e) { toast('Unban failed: ' + e.code); }
+}
+// optional hard ban: the Worker also disables / re-enables the Firebase login (needs the updated worker.js)
+async function workerAdmin(action, target){
+  if (!WORKER_URL || !auth.currentUser) return;
+  try { const idToken = await auth.currentUser.getIdToken();
+    const r = await fetch(WORKER_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({idToken, action, target})});
+    if (!r.ok) toast('The ' + action + ' is active, but the Worker could not ' + (action === 'ban' ? 'disable' : 're-enable') + ' the login (update worker.js)');
+  } catch { toast('The ' + action + ' is active, but the Worker could not be reached'); }
+}
 
 /* alert sound / vibration (default: off, saved on this device) */
 const notifMode = () => localStorage.getItem('notifMode') || 'none';
@@ -517,20 +942,50 @@ function ding(force){
       g.gain.setValueAtTime(.0001, t + dl); g.gain.exponentialRampToValueAtTime(.2, t + dl + .02); g.gain.exponentialRampToValueAtTime(.0001, t + dl + .28); o.start(t + dl); o.stop(t + dl + .32); }); } catch {} }
   if ((m === 'vibrate' || m === 'both') && navigator.vibrate) { try { navigator.vibrate([120, 60, 120]); } catch {} }
 }
-function showSound(){
-  const b = openModal('Message alert', 'sound'), cur = notifMode();
-  [['none','🔕 None (off)'], ['sound','🔊 Sound'], ['vibrate','📳 Vibration'], ['both','🔊 + 📳 Both']].forEach(([v, l]) =>
-    b.append(h('button', {class:'opt' + (cur === v ? ' on' : ''), text:l, onclick: () => { localStorage.setItem('notifMode', v); showSound(); ding(true); }})));
-  b.append(h('p', {class:'hint', text:'Off by default. Plays when a new message arrives while the page is open. Vibration works on Android phones only. Saved on this device.'}));
-}
+function showSound(){ showSettings('alerts'); }
 $('soundBtn').onclick = showSound;
 
 /* message effects: /confetti hello. Admin-only effects need Admin ON (the rules enforce this too) */
-const FX_PUB = ['confetti','fire','matrix','hearts','snow','fireworks','rain','balloons','sparkles','bubbles','petals','disco'], FX_ADM = ['lightning','quake','glitch','blackout','meteors','shockwave'];
+const FX_PUB = ['confetti','fire','matrix','hearts','snow','fireworks','rain','balloons','sparkles','bubbles','petals','disco','galaxy','rainbow','bokeh','lasers','partypop','ripple','shootingstars','laugh'];
+const FX_VIP = ['goldrain','diamonds','royal','supernova','aurora'];
+const FX_ADM = ['lightning','quake','glitch','blackout','meteors','shockwave','blackhole','thunderstorm','inferno','hammer','alarm','warp'];
+const FX_ALL = [...FX_PUB, ...FX_VIP, ...FX_ADM];
+// premium message styles: /gold hello  (combine with one effect: /fireworks /gold hello)
+const ST_PUB = ['rgb','neon','flame','static','shout','whisper','spoiler','bounce','retro','frost'];
+const ST_VIP = ['gold','regal','gem','holo','crown','prism'];
+const ST_ADM = ['banner','alert','terminal','stamp','godmode'];
+const ST_ALL = [...ST_PUB, ...ST_VIP, ...ST_ADM];
+const vipOK = () => isAdmin || isVip(me);
+const admFxOK = () => adm() || (!isAdmin && hasPerm('fxadmin'));
+const tierOf = n => (FX_PUB.includes(n) || ST_PUB.includes(n)) ? 'pub' : (FX_VIP.includes(n) || ST_VIP.includes(n)) ? 'vip' : 'adm';
+const tierOK = t => t === 'pub' || (t === 'vip' && vipOK()) || (t === 'adm' && admFxOK());
+function parseLead(text){
+  let fx = '', st = '', v = text, m, any = false;
+  while ((m = v.match(/^\/(\w+)(?:\s+|$)([\s\S]*)$/))) { const n = m[1].toLowerCase();
+    if (FX_ALL.includes(n) && !fx) fx = n; else if (ST_ALL.includes(n) && !st) st = n; else break; any = true; v = m[2]; }
+  return {fx, st, rest:v.trim(), any};
+}
+function setLead(kind, name){
+  const inp = $('msgIn'), L0 = parseLead(inp.value); let fx = L0.fx, st = L0.st;
+  if (kind === 'fx') fx = name; else st = name;
+  inp.value = [fx && '/' + fx, st && '/' + st].filter(Boolean).join(' ') + ' ' + L0.rest; inp.focus(); inp.dispatchEvent(new Event('input'));
+}
+function showFxPicker(){
+  const b = openModal('Effects & message styles', 'fxpick');
+  b.append(h('p', {class:'hint', text:'Tap one to add it to your message. Combine one effect with one style, e.g.  /fireworks /gold Happy birthday'}));
+  [['Everyone', 'pub', FX_PUB, ST_PUB], ['👑 VIP premium', 'vip', FX_VIP, ST_VIP], ['🛡 Admin power', 'adm', FX_ADM, ST_ADM]].forEach(([title, tier, fxs, sts]) => {
+    const ok = tierOK(tier); if (tier === 'adm' && !ok) return;
+    const chip = (kind, n) => h('button', {class:'chip' + (ok ? '' : ' lock'), text:(ok ? '' : '🔒 ') + (kind === 'fx' ? '✨ ' : '🎨 ') + n,
+      onclick: () => { if (!ok) return toast('👑 VIP-only. Ask the admin for VIP.'); closeModal(); setLead(kind, n); if (kind === 'fx') playFx(n); }});
+    b.append(h('div', {class:'sec'}, h('h4', {text:title}), h('div', {class:'chips'}, fxs.map(n => chip('fx', n)), sts.map(n => chip('st', n)))));
+  });
+}
+$('fxBtn').onclick = showFxPicker;
 function playFx(name){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (name === 'quake' || name === 'glitch') { const a = $('app'); a.classList.remove('quake','glitch'); void a.offsetWidth; a.classList.add(name); setTimeout(() => a.classList.remove(name), 1500); return; }
-  if (name === 'shockwave') { const a = $('app'); a.classList.remove('quake','glitch'); void a.offsetWidth; a.classList.add('quake'); setTimeout(() => a.classList.remove('quake'), 1000); }
+  if (['shockwave','thunderstorm','inferno','hammer'].includes(name)) { const a = $('app'), dl = name === 'hammer' ? 330 : name === 'thunderstorm' ? 300 : 0;
+    setTimeout(() => { a.classList.remove('quake','glitch'); void a.offsetWidth; a.classList.add('quake'); setTimeout(() => a.classList.remove('quake'), 1000); }, dl); }
   const cv = $('fx'), ctx = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight; cancelAnimationFrame(playFx.raf);
   const W = cv.width, H = cv.height, R = (a, b) => a + Math.random() * (b - a), t0 = performance.now();
   let dur = 3500, draw;
@@ -617,8 +1072,157 @@ function playFx(name){
       [0, 180, 360].forEach((d, i) => { const k = (t - d) / 1400; if (k < 0 || k > 1) return;
         ctx.strokeStyle = 'rgba(255,' + (200 - i * 50) + ',120,' + (1 - k) + ')'; ctx.lineWidth = 14 * (1 - k) + 2;
         ctx.beginPath(); ctx.arc(W / 2, H / 2, k * Math.hypot(W, H) * .55, 0, 7); ctx.stroke(); }); };
+  } else if (name === 'galaxy') {
+    dur = 4500; const S = Array.from({length:220}, () => ({a:R(0,6.283), d:R(0,.05), v:R(.003,.012), c:Math.random() < .5 ? '255,255,255' : '170,200,255'}));
+    draw = t => { const cx = W/2, cy = H/2, mx = Math.hypot(W, H)/2, fade = t > 3800 ? Math.max(0, 1 - (t - 3800)/700) : Math.min(1, t/300);
+      ctx.fillStyle = 'rgba(4,4,28,' + (.6*fade) + ')'; ctx.fillRect(0, 0, W, H);
+      S.forEach(s => { s.d += s.v * (1 + s.d*6); if (s.d > 1) { s.d = R(0,.05); s.a = R(0,6.283); }
+        const r1 = s.d*mx, r0 = Math.max(0, s.d - s.v*5)*mx;
+        ctx.strokeStyle = 'rgba(' + s.c + ',' + (fade*Math.min(1, s.d*4)) + ')'; ctx.lineWidth = 1 + s.d*2.5; ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(s.a)*r0, cy + Math.sin(s.a)*r0); ctx.lineTo(cx + Math.cos(s.a)*r1, cy + Math.sin(s.a)*r1); ctx.stroke(); }); };
+  } else if (name === 'rainbow') {
+    dur = 3800; const cs = ['#ff1744','#ff9100','#ffea00','#00e676','#2979ff','#d500f9'];
+    draw = t => { const k = Math.min(1, t/1200), e = 1 - Math.pow(1 - k, 3), fade = t > 3000 ? Math.max(0, 1 - (t - 3000)/800) : 1, lw = Math.max(10, Math.min(W, H)/22), base = Math.min(W, H*1.5)*.34;
+      ctx.lineWidth = lw; ctx.globalAlpha = .85*fade;
+      cs.forEach((c, i) => { ctx.strokeStyle = c; ctx.beginPath(); ctx.arc(W/2, H*1.02, (base + i*lw)*e, Math.PI, 0); ctx.stroke(); });
+      ctx.globalAlpha = 1; };
+  } else if (name === 'bokeh') {
+    dur = 4500; const P = Array.from({length:40}, () => ({x:R(0,W), y:R(0,H), r:R(20,70), vx:R(-.4,.4), vy:R(-.8,-.2), h:R(0,360), ph:R(0,6)}));
+    draw = t => { const fade = t > 3800 ? Math.max(0, 1 - (t - 3800)/700) : Math.min(1, t/500);
+      P.forEach(p => { p.x += p.vx; p.y += p.vy; const a = (.12 + .1*Math.sin(t/400 + p.ph))*fade, g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        g.addColorStop(0, 'hsla(' + p.h + ',100%,70%,' + (a*2) + ')'); g.addColorStop(1, 'hsla(' + p.h + ',100%,60%,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }); };
+  } else if (name === 'lasers') {
+    dur = 3800;
+    draw = t => { const fade = t > 3100 ? Math.max(0, 1 - (t - 3100)/700) : Math.min(1, t/200), Ln = Math.hypot(W, H);
+      ctx.globalCompositeOperation = 'lighter'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      for (let i = 0; i < 12; i++) { const top = i < 6, j = i % 6, x = W*(j + .5)/6, an = (top ? Math.PI/2 : -Math.PI/2) + Math.sin(t/380 + i*1.1)*.8, col = 'hsla(' + ((i*47 + t/8) % 360) + ',100%,60%,' + (.75*fade) + ')';
+        ctx.strokeStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.beginPath(); ctx.moveTo(x, top ? 0 : H); ctx.lineTo(x + Math.cos(an)*Ln, (top ? 0 : H) + Math.sin(an)*Ln); ctx.stroke(); }
+      ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over'; };
+  } else if (name === 'partypop') {
+    dur = 4200; const P = [], cols = ['#ff00cc','#00d4ff','#00ffcc','#ffd000','#ff4b2b','#b388ff','#76ff03']; let fired = 0;
+    draw = t => { while (fired < 3 && t > fired*450) { for (let s = 0; s < 2; s++) for (let i = 0; i < 70; i++) { const x = R(.6, 1.4), an = s ? x - Math.PI : -x, v = R(11, 24);
+          P.push({x:s ? W : 0, y:H, vx:Math.cos(an)*v, vy:Math.sin(an)*v, w:R(6,12), r:R(0,6), vr:R(-.3,.3), c:cols[Math.floor(R(0, cols.length))]}); } fired++; }
+      for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; p.vy += .38; p.vx *= .992; p.x += p.vx; p.y += p.vy; p.r += p.vr; if (p.y > H + 30) { P.splice(i, 1); continue; }
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w/2, -p.w/4, p.w, p.w/2); ctx.restore(); } };
+  } else if (name === 'ripple') {
+    dur = 3600; const Rp = []; let n = 0;
+    draw = t => { while (n < 6 && t > n*450) { Rp.push({x:R(W*.1, W*.9), y:R(H*.1, H*.9), t0:t, h:R(170, 230)}); n++; }
+      Rp.forEach(p => { for (let i = 0; i < 3; i++) { const k = (t - p.t0 - i*160)/1400; if (k < 0 || k > 1) continue;
+        ctx.strokeStyle = 'hsla(' + p.h + ',100%,70%,' + ((1 - k)*.8) + ')'; ctx.lineWidth = 4*(1 - k) + 1; ctx.beginPath(); ctx.arc(p.x, p.y, k*Math.min(W, H)*.35, 0, 7); ctx.stroke(); } }); };
+  } else if (name === 'shootingstars') {
+    dur = 4200; const M = [], T = Array.from({length:70}, () => ({x:R(0,W), y:R(0,H), r:R(.6,2), ph:R(0,6)})); let last = 0;
+    draw = t => { const fade = t > 3500 ? Math.max(0, 1 - (t - 3500)/700) : Math.min(1, t/300);
+      T.forEach(s => { ctx.fillStyle = 'rgba(255,255,255,' + ((.45 + .4*Math.sin(t/250 + s.ph))*fade) + ')'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill(); });
+      if (t < 3200 && t - last > 240) { last = t; M.push({x:R(-W*.2, W*.8), y:R(-60, H*.35), vx:R(11,17), vy:R(5,9)}); }
+      ctx.lineCap = 'round';
+      for (let i = M.length - 1; i >= 0; i--) { const m = M[i]; m.x += m.vx; m.y += m.vy; if (m.x > W + 80 || m.y > H + 80) { M.splice(i, 1); continue; }
+        const g = ctx.createLinearGradient(m.x, m.y, m.x - m.vx*9, m.y - m.vy*9); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(120,170,255,0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - m.vx*9, m.y - m.vy*9); ctx.stroke(); } };
+  } else if (name === 'laugh') {
+    dur = 3600; const em = ['😂','🤣','😹','😆'], P = Array.from({length:44}, () => ({x:R(0,W), y:H + R(0,H*.6), vy:R(-7,-3), s:R(26,56), e:em[Math.floor(R(0,4))], ph:R(0,6)}));
+    draw = t => P.forEach(p => { p.y += p.vy; ctx.font = p.s + 'px serif'; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.sin(t/90 + p.ph)*.4); ctx.fillText(p.e, 0, 0); ctx.restore(); });
+  } else if (name === 'goldrain') {
+    dur = 4600; const P = Array.from({length:110}, () => ({x:R(0,W), y:R(-H,0), vy:R(3,7), r:R(7,14), ph:R(0,6), sp:R(.1,.25)}));
+    draw = t => { const fade = t > 3900 ? Math.max(0, 1 - (t - 3900)/700) : 1; ctx.fillStyle = 'rgba(255,215,0,' + (.05*fade) + ')'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = fade;
+      P.forEach(p => { p.y += p.vy; if (p.y > H + 20) p.y = R(-200, -20); const w = Math.abs(Math.cos(t*p.sp/8 + p.ph))*p.r + 1;
+        ctx.fillStyle = '#ffd700'; ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(p.x, p.y, w, p.r, 0, 0, 7); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(p.x - w*.3, p.y - p.r*.3, w*.25, p.r*.3, 0, 0, 7); ctx.fill(); });
+      ctx.globalAlpha = 1; };
+  } else if (name === 'diamonds') {
+    dur = 4600; const P = Array.from({length:60}, () => ({x:R(0,W), y:R(-H,0), vy:R(2,5), s:R(10,22), r:R(0,6), vr:R(-.05,.05), h:R(170,210)}));
+    draw = t => { const fade = t > 3900 ? Math.max(0, 1 - (t - 3900)/700) : 1;
+      P.forEach(p => { p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.globalAlpha = fade; ctx.fillStyle = 'hsla(' + p.h + ',90%,75%,.85)'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(0, -p.s); ctx.lineTo(p.s*.7, 0); ctx.lineTo(0, p.s); ctx.lineTo(-p.s*.7, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-p.s*.7, 0); ctx.lineTo(p.s*.7, 0); ctx.stroke(); ctx.restore(); });
+      ctx.globalAlpha = 1; };
+  } else if (name === 'royal') {
+    dur = 4200; const C = Array.from({length:14}, () => ({x:R(W*.05, W*.95), y:H + R(0, H*.5), vy:R(-5,-2.5), s:R(32,58), ph:R(0,6)})), S = [];
+    draw = t => { const fade = t > 3500 ? Math.max(0, 1 - (t - 3500)/700) : 1;
+      if (t < 220) { ctx.fillStyle = 'rgba(255,215,0,' + ((1 - t/220)*.5) + ')'; ctx.fillRect(0, 0, W, H); }
+      if (t < 3000) for (let i = 0; i < 4; i++) S.push({x:R(0,W), y:R(0,H), l:1, s:R(6,16)});
+      ctx.globalAlpha = fade;
+      for (let i = S.length - 1; i >= 0; i--) { const p = S[i]; p.l -= .03; if (p.l <= 0) { S.splice(i, 1); continue; }
+        const sz = p.s*Math.sin(p.l*Math.PI); ctx.strokeStyle = 'rgba(255,215,90,' + p.l + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(p.x - sz, p.y); ctx.lineTo(p.x + sz, p.y); ctx.moveTo(p.x, p.y - sz); ctx.lineTo(p.x, p.y + sz); ctx.stroke(); }
+      C.forEach(p => { p.y += p.vy; ctx.font = p.s + 'px serif'; ctx.fillText('👑', p.x + Math.sin(p.y/50 + p.ph)*20, p.y); });
+      ctx.globalAlpha = 1; };
+  } else if (name === 'supernova') {
+    dur = 4000; const P = []; let bang = false;
+    draw = t => { const cx = W/2, cy = H/2, fade = t > 3300 ? Math.max(0, 1 - (t - 3300)/700) : 1;
+      if (t < 380) { const k = t/380; ctx.fillStyle = 'rgba(255,240,200,' + (.4 + .6*k) + ')'; ctx.beginPath(); ctx.arc(cx, cy, 6 + k*26, 0, 7); ctx.fill(); return; }
+      if (!bang) { bang = true; for (let i = 0; i < 280; i++) { const an = R(0, 6.283), v = R(1, 12); P.push({x:cx, y:cy, vx:Math.cos(an)*v, vy:Math.sin(an)*v, l:1, h:R(15, 55)}); } }
+      const k = (t - 380)/320; if (k < 1) { ctx.fillStyle = 'rgba(255,255,255,' + ((1 - k)*.9) + ')'; ctx.fillRect(0, 0, W, H); }
+      ctx.globalCompositeOperation = 'lighter';
+      const rk = Math.min(1, (t - 380)/1400); ctx.strokeStyle = 'rgba(255,200,100,' + ((1 - rk)*.7*fade) + ')'; ctx.lineWidth = 10*(1 - rk) + 2; ctx.beginPath(); ctx.arc(cx, cy, rk*Math.hypot(W, H)*.6, 0, 7); ctx.stroke();
+      for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; p.x += p.vx; p.y += p.vy; p.vx *= .985; p.vy *= .985; p.l -= .008; if (p.l <= 0) { P.splice(i, 1); continue; }
+        ctx.fillStyle = 'hsla(' + p.h + ',100%,60%,' + (p.l*fade) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, 7); ctx.fill(); }
+      ctx.globalCompositeOperation = 'source-over'; };
+  } else if (name === 'aurora') {
+    dur = 5000;
+    draw = t => { const fade = t < 600 ? t/600 : t > 4300 ? Math.max(0, 1 - (t - 4300)/700) : 1; ctx.globalCompositeOperation = 'lighter';
+      [140, 170, 270, 200].forEach((hue, b) => { const g = ctx.createLinearGradient(0, H*.1, 0, H*.7);
+        g.addColorStop(0, 'hsla(' + hue + ',100%,60%,0)'); g.addColorStop(.5, 'hsla(' + hue + ',100%,60%,' + (.35*fade) + ')'); g.addColorStop(1, 'hsla(' + hue + ',100%,60%,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, H);
+        for (let x = 0; x <= W; x += 20) ctx.lineTo(x, H*.35 + Math.sin(x/160 + t/700 + b*1.5)*H*.08 + Math.sin(x/70 + t/400 + b)*H*.03 + b*H*.04);
+        ctx.lineTo(W, H); ctx.closePath(); ctx.fill(); });
+      ctx.globalCompositeOperation = 'source-over'; };
+  } else if (name === 'blackhole') {
+    dur = 4500; const mx = Math.hypot(W, H)/2, P = Array.from({length:240}, () => ({a:R(0,6.283), d:R(.25,1)*mx, v:R(.01,.03), h:R(240,320)}));
+    draw = t => { const cx = W/2, cy = H/2, fade = t > 3800 ? Math.max(0, 1 - (t - 3800)/700) : Math.min(1, t/400);
+      ctx.fillStyle = 'rgba(0,0,0,' + (.55*fade) + ')'; ctx.fillRect(0, 0, W, H);
+      P.forEach(p => { p.a += p.v*(1 + 200/(p.d + 20)); p.d -= 1.8 + 400/(p.d + 40); if (p.d < 6) { p.d = R(.5,1)*mx; p.a = R(0,6.283); }
+        ctx.fillStyle = 'hsla(' + p.h + ',100%,' + (60 + (1 - p.d/mx)*25) + '%,' + fade + ')'; ctx.fillRect(cx + Math.cos(p.a)*p.d, cy + Math.sin(p.a)*p.d*.6, 2.5, 2.5); });
+      const r = 30 + Math.min(40, t/60); ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,170,60,.9)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(cx, cy, r*1.9, r*.7, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; };
+  } else if (name === 'thunderstorm') {
+    dur = 4500; const P = Array.from({length:260}, () => ({x:R(0,W), y:R(-H,H), l:R(12,26), v:R(18,30)})), FL = [300, 1100, 1900, 2700]; let bolt = [], lastF = -1;
+    draw = t => { const fade = t > 3900 ? Math.max(0, 1 - (t - 3900)/600) : 1;
+      ctx.fillStyle = 'rgba(5,10,30,' + (.45*fade) + ')'; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(170,210,255,' + (.7*fade) + ')'; ctx.lineWidth = 1.5; ctx.beginPath();
+      P.forEach(p => { p.y += p.v; p.x -= 3; if (p.y > H) { p.y = R(-120, 0); p.x = R(0, W + 120); } ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 3, p.y - p.l); }); ctx.stroke();
+      const f = FL.findIndex(s0 => t >= s0 && t < s0 + 260);
+      if (f >= 0) { if (lastF !== f) { lastF = f; let x = R(W*.1, W*.9), y = 0; bolt = [[x, y]]; while (y < H*.9) { x += R(-60, 60); y += R(25, 70); bolt.push([x, y]); } }
+        ctx.fillStyle = 'rgba(210,230,255,' + (t - FL[f] < 90 ? .6 : .25) + ')'; ctx.fillRect(0, 0, W, H);
+        ctx.strokeStyle = '#fff'; ctx.shadowColor = '#8ec5ff'; ctx.shadowBlur = 26; ctx.lineWidth = 3.5; ctx.beginPath();
+        bolt.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.shadowBlur = 0; } };
+  } else if (name === 'inferno') {
+    dur = 4200; const E = [];
+    draw = t => { const cx = W/2, cy = H*.6, fade = t > 3400 ? Math.max(0, 1 - (t - 3400)/800) : 1;
+      if (t < 260) { ctx.fillStyle = 'rgba(255,255,255,' + (t < 120 ? 1 : 1 - (t - 120)/140) + ')'; ctx.fillRect(0, 0, W, H); }
+      if (t < 1400) for (let i = 0; i < 14; i++) { const an = R(0, 6.283), v = R(2, 11); E.push({x:cx, y:cy, vx:Math.cos(an)*v, vy:Math.sin(an)*v - 2.5, l:1, s:R(14, 44)}); }
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = E.length - 1; i >= 0; i--) { const p = E[i]; p.x += p.vx; p.y += p.vy; p.vy -= .06; p.vx *= .985; p.l -= .011; if (p.l <= 0) { E.splice(i, 1); continue; }
+        ctx.fillStyle = 'rgba(255,' + Math.floor(40 + p.l*170) + ',' + Math.floor(p.l*40) + ',' + (p.l*.5*fade) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, p.s*(.4 + p.l*.6), 0, 7); ctx.fill(); }
+      ctx.globalCompositeOperation = 'source-over';
+      for (let i = 0; i < 3; i++) { const k = (t - i*220)/1500; if (k < 0 || k > 1) continue; ctx.strokeStyle = 'rgba(255,' + (210 - i*50) + ',120,' + ((1 - k)*.85*fade) + ')'; ctx.lineWidth = 12*(1 - k) + 2; ctx.beginPath(); ctx.ellipse(cx, cy, k*W*.7, k*W*.22, 0, 0, 7); ctx.stroke(); } };
+  } else if (name === 'hammer') {
+    dur = 2800; const cr = Array.from({length:16}, () => ({a:R(0,6.283), l:R(.12,.5)}));
+    draw = t => { const cx = W/2, cy = H/2, sz = Math.min(W, H)*.5, k = Math.min(1, t/330), fade = t > 2200 ? Math.max(0, 1 - (t - 2200)/600) : 1;
+      const hy = -sz + (cy + sz*.1 + sz)*k*k, rot = -.7 + .7*k;
+      ctx.globalAlpha = fade; ctx.textAlign = 'center'; ctx.font = sz + 'px serif';
+      ctx.save(); ctx.translate(cx, hy); ctx.rotate(rot); ctx.fillText('🔨', 0, 0); ctx.restore();
+      if (t >= 330) { const q = Math.min(1, (t - 330)/700), iy = cy + sz*.1;
+        if (t < 480) { ctx.fillStyle = 'rgba(255,255,255,' + ((1 - (t - 330)/150)*.7) + ')'; ctx.fillRect(0, 0, W, H); }
+        ctx.strokeStyle = 'rgba(255,255,255,' + ((1 - q*.4)*fade) + ')'; ctx.lineWidth = 3; ctx.beginPath();
+        cr.forEach(c => { const L2 = c.l*Math.min(W, H)*q; ctx.moveTo(cx, iy); ctx.lineTo(cx + Math.cos(c.a)*L2*.5 + Math.sin(c.a*3)*10, iy + Math.sin(c.a)*L2*.5); ctx.lineTo(cx + Math.cos(c.a)*L2, iy + Math.sin(c.a)*L2); });
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,170,60,' + ((1 - q)*.9*fade) + ')'; ctx.lineWidth = 10*(1 - q) + 2; ctx.beginPath(); ctx.arc(cx, iy, q*Math.min(W, H)*.6, 0, 7); ctx.stroke(); }
+      ctx.globalAlpha = 1; };
+  } else if (name === 'alarm') {
+    dur = 3800;
+    draw = t => { const fade = t > 3100 ? Math.max(0, 1 - (t - 3100)/700) : 1, on = Math.floor(t/260) % 2;
+      ctx.fillStyle = (on ? 'rgba(255,0,40,' : 'rgba(0,90,255,') + (.24*fade) + ')'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(0,0,0,' + (.2*fade) + ')'; for (let y = 0; y < H; y += 6) ctx.fillRect(0, y, W, 2);
+      ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,' + fade + ')'; ctx.font = '900 ' + Math.min(W/7, 96) + 'px sans-serif'; ctx.fillText('⚠ ALERT ⚠', W/2, H/2);
+      ctx.font = '700 ' + Math.min(W/22, 26) + 'px monospace'; ctx.fillText('ADMIN ATTENTION', W/2, H/2 + Math.min(W/9, 64)); };
+  } else if (name === 'warp') {
+    dur = 3800; const mx = Math.hypot(W, H)/2, S = Array.from({length:160}, () => ({a:R(0,6.283), d:R(0,1), v:R(.015,.04)}));
+    draw = t => { const cx = W/2, cy = H/2, fade = t > 3200 ? Math.max(0, 1 - (t - 3200)/600) : Math.min(1, t/250);
+      ctx.fillStyle = 'rgba(0,5,25,' + (.7*fade) + ')'; ctx.fillRect(0, 0, W, H);
+      ctx.lineWidth = 3; for (let i = 0; i < 9; i++) { const k = ((t/700) + i/9) % 1; ctx.strokeStyle = 'rgba(' + (80 + i*15) + ',200,255,' + ((1 - k)*.7*fade) + ')'; ctx.beginPath(); ctx.arc(cx, cy, k*k*mx, 0, 7); ctx.stroke(); }
+      ctx.lineWidth = 2; S.forEach(s => { s.d += s.v*(1 + s.d*5); if (s.d > 1) { s.d = R(0,.08); s.a = R(0,6.283); } const r1 = s.d*mx, r0 = Math.max(0, s.d - s.v*9)*mx;
+        ctx.strokeStyle = 'rgba(190,230,255,' + (fade*Math.min(1, s.d*3)) + ')'; ctx.beginPath(); ctx.moveTo(cx + Math.cos(s.a)*r0, cy + Math.sin(s.a)*r0); ctx.lineTo(cx + Math.cos(s.a)*r1, cy + Math.sin(s.a)*r1); ctx.stroke(); }); };
   } else return;
-  const step = now => { const t = now - t0; ctx.clearRect(0, 0, W, H); draw(t); if (t < dur) playFx.raf = requestAnimationFrame(step); else ctx.clearRect(0, 0, W, H); };
+  const step = now => { const t = Math.max(0, now - t0); ctx.clearRect(0, 0, W, H); draw(t); if (t < dur) playFx.raf = requestAnimationFrame(step); else ctx.clearRect(0, 0, W, H); };
   playFx.raf = requestAnimationFrame(step);
 }
 
@@ -639,9 +1243,10 @@ function pickSuggest(i){
 function updateSuggest(){
   const inp = $('msgIn'); if (inp.disabled) return hideSuggest();
   const pos = inp.selectionStart ?? inp.value.length, before = inp.value.slice(0, pos);
-  const fm = before.match(/^\/(\w*)$/);
+  const fm = before.match(/^(?:\/\w+\s+)?\/(\w*)$/);
   if (fm) { const q = fm[1].toLowerCase();
-    return showSuggest([...FX_PUB, ...(adm() ? FX_ADM : [])].filter(n => n.startsWith(q)).map(n => ({label:'✨ /' + n + (FX_ADM.includes(n) ? ' (admin)' : ''), from:0, ins:'/' + n + ' '}))); }
+    const items = [...FX_ALL.map(n => ['fx', n]), ...ST_ALL.map(n => ['st', n])].filter(([, n]) => n.startsWith(q) && tierOK(tierOf(n)));
+    return showSuggest(items.slice(0, 14).map(([k, n]) => ({label:(k === 'fx' ? '✨' : '🎨') + ' /' + n + (tierOf(n) === 'vip' ? ' 👑' : tierOf(n) === 'adm' ? ' 🛡' : ''), from:pos - q.length - 1, ins:'/' + n + ' '}))); }
   const mm = chat.kind === 'group' && before.match(/(?:^|\s)@(\w*)$/);
   if (mm) { const q = mm[1].toLowerCase(), from = before.length - mm[1].length - 1;
     return showSuggest([...new Set([...Object.keys(NAMES), ...profiles])].filter(u => u !== me && (u.startsWith(q) || nm(u).toLowerCase().startsWith(q))).slice(0, 6).map(u => ({label:nm(u) + ' @' + u, from, ins:'@' + u + ' '}))); }
@@ -746,7 +1351,7 @@ setInterval(() => { if (me && auth.currentUser) { updateComposer(); updateTyping
 function applyChatState(){
   const a = $('annBar'), p = $('pinBar');
   if (settings.announce && settings.announce.text) { a.style.display = 'block'; a.textContent = '📢 ' + settings.announce.text; } else a.style.display = 'none';
-  if (settings.pin) { p.style.display = 'flex'; $('pinTxt').textContent = '📌 ' + settings.pin.name + ': ' + settings.pin.text; $('unpinBtn').style.display = adm() ? 'flex' : 'none'; }
+  if (settings.pin) { p.style.display = 'flex'; $('pinTxt').textContent = '📌 ' + settings.pin.name + ': ' + settings.pin.text; $('unpinBtn').style.display = can('pin') ? 'flex' : 'none'; }
   else p.style.display = 'none';
   updateComposer();
 }
@@ -762,12 +1367,14 @@ function render(){
     const dt = m.ts ? m.ts.toDate() : new Date(), day = dt.toDateString();
     if (day !== lastDay) { lastDay = day; box.append(h('div', {class:'dsep', text:dayLabel(dt)})); }
     el.className = 'msg' + (mine ? ' mine' : '') + (openMsg === d.id ? ' open' : ''); el.dataset.id = d.id;
+    if (m.st && !gone && ST_ALL.includes(m.st)) el.classList.add('st-' + m.st);
     const who = document.createElement('b'); who.textContent = m.name || m.from;
     who.onclick = ev => { if (chat.kind==='group' && m.from!==me) { ev.stopPropagation(); $('msgIn').value += '@'+m.from+' '; $('msgIn').focus(); } };
     const t = document.createElement('time'); t.textContent = m.ts ? dt.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '…';
-    el.append(who, t);
+    const vipA = isVip(m.from); if (vipA) { who.classList.add('vipname'); el.classList.add('vipmsg'); }
+    el.append(avEl(m.from, 24), who, ...(vipA ? [h('span', {class:'vipbadge', text:'VIP'})] : []), t);
     if (m.edited && !gone) { const e = document.createElement('small'); e.className = 'edited'; e.textContent = ' (edited)'; el.append(e); }
-    if (starred.has(d.id)) el.append(h('span', {class:'starmark', text:' ⭐'}));
+    if (starred.has(d.id)) el.append(h('span', {class:'starmark', text:' ' + icon('starOn')}));
     if (m.fx && !gone) el.append(h('span', {class:'fxtag', text:' ✨ ' + m.fx, title:'Play again', onclick: ev => { ev.stopPropagation(); playFx(m.fx); }}));
     if (m.reply) {
       const q = document.createElement('div'); q.className = 'quote';
@@ -777,8 +1384,10 @@ function render(){
     const tx = document.createElement('div'); tx.className = 'txt';
     if (gone) {
       tx.classList.add('gone'); tx.textContent = '🚫 message deleted';
-      if (adm()) { tx.title = 'Click to view the original'; tx.style.cursor = 'pointer'; tx.onclick = ev => { ev.stopPropagation(); showOriginal(d, m); }; }
-    } else tx.innerHTML = fmtText(m.text);
+      if (can('unsent')) { tx.title = 'Click to view the original'; tx.style.cursor = 'pointer'; tx.onclick = ev => { ev.stopPropagation(); showOriginal(d, m); }; }
+    } else { tx.innerHTML = fmtText(m.text);
+      if (m.st === 'spoiler') { if (revealed.has(d.id)) el.classList.add('rev');
+        tx.onclick = ev => { ev.stopPropagation(); if (revealed.has(d.id)) revealed.delete(d.id); else revealed.add(d.id); el.classList.toggle('rev'); }; } }
     el.append(tx);
     const rxs = gone ? [] : RX.filter(([k]) => ((m.reactions || {})[k] || []).length);
     if (rxs.length) {
@@ -795,19 +1404,19 @@ function render(){
     if (!gone) {
       if (part) {
         const pk = h('span', {class:'picker'}); RX.forEach(([k, e]) => pk.append(mk(e, 'React', () => react(d, m, k)))); a.append(pk);
-        a.append(mk('↩', 'Reply', () => startReply(d.id, m)));
-        a.append(mk(starred.has(d.id) ? '⭐' : '☆', starred.has(d.id) ? 'Remove from saved' : 'Save message', () => toggleStar(d, m)));
+        a.append(mk(icon('reply'), 'Reply', () => startReply(d.id, m)));
+        a.append(mk(starred.has(d.id) ? icon('starOn') : icon('star'), starred.has(d.id) ? 'Remove from saved' : 'Save message', () => toggleStar(d, m)));
         const canOwn = mine && !String(m.text).startsWith('📞') && (adm() || (m.ts && Date.now() - tms(m.ts) < EDIT_MS));
-        if (canOwn) { a.append(mk('✏', 'Edit', () => startEdit(d, m))); a.append(mk('🗑', 'Unsend', () => unsend(d, m))); }
+        if (canOwn) { a.append(mk(icon('edit'), 'Edit', () => startEdit(d, m))); a.append(mk(icon('unsend'), 'Unsend', () => unsend(d, m))); }
       }
-      if (adm()) {
-        a.append(mk('📌', 'Pin message', () => setSet({pin:{id:d.id, name:m.name || m.from, text:String(m.text).slice(0, 100)}}, 'pin', nm(m.from) + ': ' + String(m.text).slice(0, 60))));
-        if (m.history && m.history.length) a.append(mk('🕘', 'Edit history', () => showHistory(m)));
+      if (can('pin') || can('unsent')) {
+        if (can('pin')) a.append(mk(icon('pin'), 'Pin message', () => setSet({pin:{id:d.id, name:m.name || m.from, text:String(m.text).slice(0, 100)}}, 'pin', nm(m.from) + ': ' + String(m.text).slice(0, 60))));
+        if (can('unsent') && m.history && m.history.length) a.append(mk(icon('hist'), 'Edit history', () => showHistory(m)));
       }
-    } else if (adm()) a.append(mk('👁', 'View original', () => showOriginal(d, m)));
+    } else if (can('unsent')) a.append(mk(icon('view'), 'View original', () => showOriginal(d, m)));
     if (a.childElementCount) el.append(a);
     el.onclick = ev => { if (ev.target.closest('a')) return; openMsg = openMsg === d.id ? null : d.id; box.querySelectorAll('.msg').forEach(x => x.classList.toggle('open', x.dataset.id === openMsg)); };
-    if (adm()) { const x = document.createElement('button'); x.className='del'; x.textContent='✕';
+    if (can('delmsg') && (isAdmin || m.from !== 'admin')) { const x = document.createElement('button'); x.className='del'; x.textContent='✕';
       x.onclick = ev => { ev.stopPropagation(); deleteDoc(d.ref); logAudit('delete-message', nm(m.from) + ': ' + (gone ? '[unsent]' : String(m.text).slice(0, 60))); }; el.append(x); }
     box.append(el);
   });
@@ -849,13 +1458,12 @@ async function send(){
     return;
   }
   const cs = composerState(); if (!cs.ok || cs.soft) return toast(cs.msg);
-  let fx = ''; const fm = text.match(/^\/(\w+)(?:\s+([\s\S]*))?$/);
-  if (fm) { const n = fm[1].toLowerCase();
-    if (FX_PUB.includes(n) || FX_ADM.includes(n)) {
-      if (FX_ADM.includes(n) && !adm()) return toast('That effect is admin-only');
-      fx = n; text = (fm[2] || '').trim() || '✨ ' + n; } }
+  let fx = '', st = ''; const L0 = parseLead(raw);
+  if (L0.any) {
+    for (const n of [L0.fx, L0.st]) if (n && !tierOK(tierOf(n))) return toast(tierOf(n) === 'vip' ? '👑 That one is VIP-only' : 'That one is admin-only');
+    fx = L0.fx; st = L0.st; text = L0.rest || '✨ ' + [fx, st].filter(Boolean).join(' · '); }
   $('msgIn').value = ''; localStorage.removeItem(draftKey(readId())); hideSuggest(); const c = chat, r = replyTo; clearCompose();
-  const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r; if (fx) data.fx = fx;
+  const data = {from:me, name:nm(me), text, ts:serverTimestamp()}; if (r) data.reply = r; if (fx) data.fx = fx; if (st) data.st = st;
   try {
     const key = readId(), b = writeBatch(db);
     b.set(doc(colRef()), data);
@@ -867,12 +1475,16 @@ $('sendBtn').onclick = send;
 /* ---------- admin ---------- */
 function adm(){ return isAdmin && adminOn; }
 function applyAdminUI(fromToggle){
-  $('whoami').textContent = nm(me) + (adm() ? ' (admin)' : '');
-  document.querySelectorAll('.admin-only').forEach(b => b.style.display = adm() ? 'flex' : 'none');
+  const vipMe = !isAdmin && isVip(me);
+  $('whoami').textContent = nm(me) + (adm() ? ' (admin)' : '') + (vipMe ? ' 👑 VIP' : ''); $('whoami').className = vipMe ? 'vipname' : '';
+  const vis = (id, on) => { const e = $(id); if (e) e.style.display = on ? 'flex' : 'none'; };
+  vis('clearBtn', can('delall')); vis('kickAllBtn', adm()); vis('monBtn', can('monitor')); vis('actBtn', can('activity')); vis('auditBtn', can('logs'));
+  vis('adminBar', can('delall') || adm() || can('monitor') || can('activity') || can('logs'));
+  vis('toolsBtn', ['lock','slow','announce','pin','mute','warn','delall','export'].some(can));
   const t = $('adminToggle'); t.style.display = isAdmin ? 'flex' : 'none'; t.textContent = 'Admin: ' + (adminOn ? 'ON' : 'OFF');
   if (!fromToggle) return;
   if (!adm()) closeModal();
-  if (!adm() && chat.kind === 'dm' && !chat.id.split('__').includes(me)) return openChat('group', '', 'Group chat');   // leave monitor view
+  if (!can('monitor') && chat.kind === 'dm' && !chat.id.split('__').includes(me)) return openChat('group', '', 'Group chat');   // leave monitor view
   drawMembers(); render(); applyChatState(); markRead(); [...unreadWatch.keys()].forEach(refreshUnread);
 }
 $('adminToggle').onclick = () => {
@@ -885,9 +1497,10 @@ async function setSet(patch, action, detail){
   catch (e) { toast('Failed: ' + e.code); }
 }
 $('clearBtn').onclick = async () => {
+  if (!can('delall')) return;
   if (!confirm('Delete ALL messages in "' + chat.label + '"?')) return;
   const s = await getDocs(colRef()); let b = writeBatch(db), n = 0;
-  for (const d of s.docs) { b.delete(d.ref); if (++n % 400 === 0) { await b.commit(); b = writeBatch(db); } }
+  for (const d of s.docs.filter(x => isAdmin || x.data().from !== 'admin')) { b.delete(d.ref); if (++n % 400 === 0) { await b.commit(); b = writeBatch(db); } }
   await b.commit(); logAudit('clear-history', n + ' messages'); toast('History cleared');
 };
 $('kickAllBtn').onclick = async () => { await setDoc(doc(db,'control','logout'), {target:'all', at:Date.now()}); logAudit('logout-all', ''); toast('Everyone else was logged out'); };
@@ -915,41 +1528,41 @@ function renderTools(){
   const b = $('mBody'); b.innerHTML = '';
   const sec = (t, ...k) => b.append(h('div', {class:'sec'}, h('h4', {text:t}), ...k));
   const sel = arr => { const e = h('select'); arr.forEach(([v, l]) => e.append(h('option', {value:v, text:l}))); return e; };
-  const others = chatUsers().filter(u => u !== me), all = chatUsers();
+  const all = chatUsers().filter(u => isAdmin || u !== 'admin'), others = all.filter(u => u !== me && (isAdmin || !isVip(u)));
   const opts = list => list.map(u => [u, nm(u)]);
 
-  sec('Lock', h('button', {class: settings.locked ? 'btn-clear' : 'btn-back', text: settings.locked ? '🔓 Unlock chat' : '🔒 Lock chat (read-only for everyone else)',
+  if (can('lock')) sec('Lock', h('button', {class: settings.locked ? 'btn-clear' : 'btn-back', text: settings.locked ? '🔓 Unlock chat' : '🔒 Lock chat (read-only for everyone else)',
     onclick: () => setSet({locked: !settings.locked}, settings.locked ? 'unlock' : 'lock', '')}));
 
   const slow = sel([[0,'Off'],[5,'5 seconds'],[10,'10 seconds'],[30,'30 seconds'],[60,'1 minute'],[300,'5 minutes']]);
   slow.value = String(settings.slow | 0);
   slow.onchange = () => setSet({slow: +slow.value}, 'slow-mode', slow.value + 's');
-  sec('Slow mode (time between messages per person)', slow);
+  if (can('slow')) sec('Slow mode (time between messages per person)', slow);
 
   const ann = h('input', {placeholder:'Announcement text…', maxlength:'300'});
   const annRow = h('div', {class:'row'}, ann, h('button', {text:'Post', onclick: () => { const t = ann.value.trim(); if (t) setSet({announce:{text:t, by:me, at:Date.now()}}, 'announce', t); }}));
   if (settings.announce) annRow.append(h('button', {class:'btn-clear', text:'Remove', onclick: () => setSet({announce: deleteField()}, 'announce-remove', '')}));
-  sec('Announcement banner', annRow, h('p', {class:'hint', text: settings.announce ? 'Showing: ' + settings.announce.text : 'Shows at the top of this chat for everyone.'}));
+  if (can('announce')) sec('Announcement banner', annRow, h('p', {class:'hint', text: settings.announce ? 'Showing: ' + settings.announce.text : 'Shows at the top of this chat for everyone.'}));
 
-  sec('Pinned message', h('p', {class:'hint', text: settings.pin ? '📌 ' + settings.pin.name + ': ' + settings.pin.text : 'Nothing pinned. Tap a message, then 📌.'}),
+  if (can('pin')) sec('Pinned message', h('p', {class:'hint', text: settings.pin ? '📌 ' + settings.pin.name + ': ' + settings.pin.text : 'Nothing pinned. Tap a message, then 📌.'}),
     settings.pin ? h('button', {class:'btn-clear', text:'Unpin', onclick: () => setSet({pin: deleteField()}, 'unpin', '')}) : '');
 
   if (others.length) {
     const mu = sel(opts(others)), du = sel([[10,'10 minutes'],[60,'1 hour'],[1440,'24 hours']]);
     const active = Object.entries(settings.mutes || {}).filter(([, t]) => tms(t) > Date.now());
-    sec('Mute user', h('div', {class:'row'}, mu, du, h('button', {text:'Mute', onclick: () => setSet({mutes:{[mu.value]: new Date(Date.now() + du.value * 60000)}}, 'mute', nm(mu.value) + ' ' + du.options[du.selectedIndex].text)})),
+    if (can('mute')) sec('Mute user', h('div', {class:'row'}, mu, du, h('button', {text:'Mute', onclick: () => setSet({mutes:{[mu.value]: new Date(Date.now() + du.value * 60000)}}, 'mute', nm(mu.value) + ' ' + du.options[du.selectedIndex].text)})),
       ...active.map(([u, t]) => h('div', {class:'row', style:'margin-top:8px'}, h('span', {text:'🔇 ' + nm(u) + ' until ' + new Date(tms(t)).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}),
         h('button', {text:'Unmute', onclick: () => setSet({mutes:{[u]: deleteField()}}, 'unmute', nm(u))}))));
 
     const wu = sel(opts(others)), wt = h('input', {placeholder:'Private warning…', maxlength:'200'});
-    sec('Warn user (private pop-up only they see)', h('div', {class:'row'}, wu, wt, h('button', {text:'Send', onclick: async () => {
+    if (can('warn')) sec('Warn user (private pop-up only they see)', h('div', {class:'row'}, wu, wt, h('button', {text:'Send', onclick: async () => {
       const t = wt.value.trim(); if (!t) return;
       try { await setDoc(doc(db,'warn',wu.value), {text:t, at:Date.now(), by:me}); logAudit('warn', nm(wu.value) + ': ' + t); wt.value = ''; toast('Warning sent'); } catch (e) { toast('Failed: ' + e.code); } }})));
   }
 
   const du2 = sel(opts(all));
-  sec('Delete all messages from one user (this chat)', h('div', {class:'row'}, du2, h('button', {class:'btn-clear', text:'Delete', onclick: () => deleteUserMsgs(du2.value)})));
-  sec('Export', h('button', {text:'⬇ Download this chat (.txt)', onclick: exportChat}));
+  if (can('delall')) sec('Delete all messages from one user (this chat)', h('div', {class:'row'}, du2, h('button', {class:'btn-clear', text:'Delete', onclick: () => deleteUserMsgs(du2.value)})));
+  if (can('export')) sec('Export', h('button', {text:'⬇ Download this chat (.txt)', onclick: exportChat}));
 }
 async function deleteUserMsgs(u){
   if (!confirm('Delete ALL messages from ' + nm(u) + ' in "' + chat.label + '"?')) return;
@@ -985,16 +1598,32 @@ $('actBtn').onclick = async () => {
   b.append(h('div', {class:'tbl-wrap'}, h('table', {class:'tbl'}, tr(['User','Status','Notifications','Group msgs'], true),
     ...rows.map(r => { const p = presence[r.u]; return tr([nm(r.u), isOnline(r.u) ? '🟢 online' : (p && p.t ? 'last seen ' + ago(p.t) : 'never'), r.notif, r.cnt]); }))));
 };
-$('auditBtn').onclick = async () => {
-  const b = openModal('Audit log', 'audit'); b.append(h('p', {class:'hint', text:'Loading…'}));
+$('auditBtn').onclick = showLogs;
+async function showLogs(){
+  if (!can('logs')) return;
+  const b = openModal('Logs', 'audit');
+  b.append(h('div', {class:'row', style:'margin-bottom:8px'}, h('button', {class:'btn-back', text:'↻ Refresh', onclick:showLogs}),
+    adm() ? h('button', {class:'btn-clear', text:'🗑 Clear logs', onclick:clearLogs}) : h('span', {class:'hint', text:'Read-only: only the admin can clear the logs.'})));
+  const box = h('div'); b.append(box); box.append(h('p', {class:'hint', text:'Loading…'}));
   try {
-    const s = await getDocs(query(collection(db,'audit'), orderBy('at','desc'), limit(100)));
-    if (modalKind !== 'audit') return; b.innerHTML = '';
-    if (!s.size) b.append(h('p', {class:'hint', text:'Nothing logged yet.'}));
-    s.docs.forEach(d => { const x = d.data();
-      b.append(h('div', {class:'arow'}, h('b', {text:(x.at ? x.at.toDate().toLocaleString() : '…') + ' · ' + nm(x.by) + ' · ' + x.action}), h('span', {text:(x.chat || '') + (x.detail ? ' — ' + x.detail : '')}))); });
-  } catch (e) { b.innerHTML = ''; b.append(h('p', {class:'hint', text:'Could not load: ' + e.code})); }
-};
+    const s = await getDocs(query(collection(db,'audit'), orderBy('at','desc'), limit(200)));
+    if (modalKind !== 'audit') return; box.innerHTML = '';
+    if (!s.size) box.append(h('p', {class:'hint', text:'Nothing logged yet.'}));
+    const RED = ['ban','unban','kick','logout-all','clear-history','clear-logs','delete-user-messages'];
+    s.docs.forEach(d => { const x = d.data(), vip = isVip(x.by);
+      box.append(h('div', {class:'arow', style: RED.includes(x.action) ? 'border-left:3px solid #ff4b2b;padding-left:8px' : /^vip|avatar/.test(x.action) ? 'border-left:3px solid #ffd700;padding-left:8px' : ''},
+        h('b', {text:(x.at ? x.at.toDate().toLocaleString() : '…') + ' · ' + nm(x.by) + (vip ? ' 👑' : '') + ' · ' + x.action}), h('span', {text:(x.chat || '') + (x.detail ? ' — ' + x.detail : '')}))); });
+  } catch (e) { box.innerHTML = ''; box.append(h('p', {class:'hint', text:'Could not load: ' + e.code})); }
+}
+// only the admin account can clear the logs (the rules enforce this too); the clearing itself is logged
+async function clearLogs(){
+  if (!adm() || !confirm('Delete ALL log entries? This cannot be undone.')) return;
+  try {
+    let n = 0;
+    for (;;) { const s = await getDocs(query(collection(db,'audit'), limit(400))); if (!s.size) break; const bt = writeBatch(db); s.docs.forEach(d => bt.delete(d.ref)); await bt.commit(); n += s.size; }
+    await logAudit('clear-logs', n + ' entries removed'); toast('Logs cleared'); showLogs();
+  } catch (e) { toast('Failed: ' + e.code); }
+}
 
 /* ---------- voice calls (WebRTC, signaling through Firestore) ---------- */
 let pc = null, localStream = null, callRef = null, callUnsubs = [], pendingICE = [], callRole = '', callPeer = '';
@@ -1032,7 +1661,7 @@ function flashTitle(on, who){
   if (on) { let f = 0; titleT = setInterval(() => { document.title = (f ^= 1) ? '📞 ' + who + ' calling…' : 'NEON CHAT'; }, 800); }
 }
 function showCallUI(peer, status, incoming){
-  $('callName').textContent = nm(peer); $('callAvatar').textContent = nm(peer).charAt(0).toUpperCase();
+  $('callName').textContent = nm(peer); { const ca = $('callAvatar'); ca.textContent = ''; const av = avEl(peer, 120); av.style.cssText += ';margin:0;border:none;border-radius:50%;clip-path:none;font-size:3rem'; ca.append(av); }
   $('callStatus').textContent = status; $('callUI').style.display = 'flex';
   $('acceptBtn').style.display = incoming ? 'flex' : 'none';
   $('muteBtn').style.display = incoming ? 'none' : 'flex'; $('muteBtn').textContent = 'Mute';
@@ -1130,34 +1759,22 @@ $('muteBtn').onclick = () => { const t = localStream && localStream.getAudioTrac
 let messaging = null;
 try { messaging = getMessaging(app); } catch {}
 async function registerPush(){
-  if (!('serviceWorker' in navigator)) throw new Error('This browser has no service-worker support.');
-  if (!messaging) throw new Error('Push is not supported in this browser. On iPhone/iPad: tap Share → Add to Home Screen, then open the chat from that icon. In-app browsers (Instagram, Telegram, etc.) cannot do push; open the site in Chrome or Safari.');
   const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-  await navigator.serviceWorker.ready;
   const token = await getToken(messaging, {vapidKey:VAPID_KEY, serviceWorkerRegistration:reg});
-  if (!token) throw new Error('The browser did not return a push token.');
   await setDoc(doc(db,'tokens',me), {tokens:arrayUnion(token)}, {merge:true});
-  const back = await getDoc(doc(db,'tokens',me));                       // confirm it really saved
-  if (!((back.data() || {}).tokens || []).includes(token)) throw new Error('The token could not be saved to Firebase.');
   localStorage.setItem('fcmToken', token);
-}
-function pushFail(e){
-  console.warn('push setup failed', e);
-  $('notifBtn').textContent = 'Alerts: tap to fix';
-  const b = openModal('Push setup failed', 'pushfail');
-  b.append(h('p', {text:String((e && (e.message || e.code)) || e)}),
-    h('p', {class:'hint', text:'Checklist: 1) allow notifications for this site in the browser settings; 2) the file firebase-messaging-sw.js must sit next to index.html on GitHub; 3) on iPhone, install to the Home Screen first; 4) then tap Enable notifications again.'}));
 }
 async function autoNotif(){
   if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-    try { await registerPush(); $('notifBtn').textContent = 'Alerts on ✓'; } catch (e) { pushFail(e); }
+    $('notifBtn').textContent = 'Alerts on ✓';
+    if (messaging) registerPush().catch(() => {});
   }
 }
 $('notifBtn').onclick = async () => {
-  if (typeof Notification === 'undefined') return pushFail(new Error('This browser cannot show notifications. On iPhone/iPad: Share → Add to Home Screen first, then open the chat from the icon.'));
-  if (Notification.permission === 'denied') return pushFail(new Error('Notifications are blocked for this site. Allow them in the browser or site settings, then reload the page.'));
-  if (await Notification.requestPermission() !== 'granted') return toast('Notifications were not allowed');
-  try { await registerPush(); $('notifBtn').textContent = 'Alerts on ✓'; toast('Push is ready on this device ✓'); } catch (e) { pushFail(e); }
+  if (typeof Notification === 'undefined') return toast('Notifications are not supported in this browser');
+  if (await Notification.requestPermission() !== 'granted') return toast('Notifications were blocked');
+  $('notifBtn').textContent = 'Alerts on ✓'; toast('Alerts enabled on this device');
+  if (messaging) { try { await registerPush(); } catch (e) { console.warn('push token failed', e); } }
 };
 </script>
 </body>
