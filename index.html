@@ -1130,22 +1130,34 @@ $('muteBtn').onclick = () => { const t = localStream && localStream.getAudioTrac
 let messaging = null;
 try { messaging = getMessaging(app); } catch {}
 async function registerPush(){
+  if (!('serviceWorker' in navigator)) throw new Error('This browser has no service-worker support.');
+  if (!messaging) throw new Error('Push is not supported in this browser. On iPhone/iPad: tap Share → Add to Home Screen, then open the chat from that icon. In-app browsers (Instagram, Telegram, etc.) cannot do push; open the site in Chrome or Safari.');
   const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+  await navigator.serviceWorker.ready;
   const token = await getToken(messaging, {vapidKey:VAPID_KEY, serviceWorkerRegistration:reg});
+  if (!token) throw new Error('The browser did not return a push token.');
   await setDoc(doc(db,'tokens',me), {tokens:arrayUnion(token)}, {merge:true});
+  const back = await getDoc(doc(db,'tokens',me));                       // confirm it really saved
+  if (!((back.data() || {}).tokens || []).includes(token)) throw new Error('The token could not be saved to Firebase.');
   localStorage.setItem('fcmToken', token);
+}
+function pushFail(e){
+  console.warn('push setup failed', e);
+  $('notifBtn').textContent = 'Alerts: tap to fix';
+  const b = openModal('Push setup failed', 'pushfail');
+  b.append(h('p', {text:String((e && (e.message || e.code)) || e)}),
+    h('p', {class:'hint', text:'Checklist: 1) allow notifications for this site in the browser settings; 2) the file firebase-messaging-sw.js must sit next to index.html on GitHub; 3) on iPhone, install to the Home Screen first; 4) then tap Enable notifications again.'}));
 }
 async function autoNotif(){
   if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-    $('notifBtn').textContent = 'Alerts on ✓';
-    if (messaging) registerPush().catch(() => {});
+    try { await registerPush(); $('notifBtn').textContent = 'Alerts on ✓'; } catch (e) { pushFail(e); }
   }
 }
 $('notifBtn').onclick = async () => {
-  if (typeof Notification === 'undefined') return toast('Notifications are not supported in this browser');
-  if (await Notification.requestPermission() !== 'granted') return toast('Notifications were blocked');
-  $('notifBtn').textContent = 'Alerts on ✓'; toast('Alerts enabled on this device');
-  if (messaging) { try { await registerPush(); } catch (e) { console.warn('push token failed', e); } }
+  if (typeof Notification === 'undefined') return pushFail(new Error('This browser cannot show notifications. On iPhone/iPad: Share → Add to Home Screen first, then open the chat from the icon.'));
+  if (Notification.permission === 'denied') return pushFail(new Error('Notifications are blocked for this site. Allow them in the browser or site settings, then reload the page.'));
+  if (await Notification.requestPermission() !== 'granted') return toast('Notifications were not allowed');
+  try { await registerPush(); $('notifBtn').textContent = 'Alerts on ✓'; toast('Push is ready on this device ✓'); } catch (e) { pushFail(e); }
 };
 </script>
 </body>
